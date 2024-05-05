@@ -1,3 +1,7 @@
+val kotlin_version: String by project
+val junit_version:String by project
+val lombok_version:String by project
+
 plugins {
     kotlin("jvm") version "1.9.23"
     id("java")
@@ -21,20 +25,15 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
-        implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
         implementation(fileTree("./lib"))
-        implementation("cn.hutool:hutool-all:5.8.27")
 
-        testImplementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
-        testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
-        testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+        testImplementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
 
         compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
-        compileOnly("org.projectlombok:lombok:1.18.24")
+        compileOnly("org.projectlombok:lombok:$lombok_version")
     }
 
     tasks {

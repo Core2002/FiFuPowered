@@ -1,0 +1,20 @@
+# Copyright (c) 2021 NekokeCore
+# EditBook is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+main: fun.fifu.bookedit.BookEdit
+version: 2.33
+name: BookEdit
+author: NekokeCore
+# 接高版本插件定制，小白的QQ：3513353936
+api-version: 1.13
+commands:
+  book:
+    description: "主命令"
+    usage: 命令输入有误！ /book help [命令] 查看帮助
