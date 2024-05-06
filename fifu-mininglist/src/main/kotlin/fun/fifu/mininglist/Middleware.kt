@@ -97,7 +97,7 @@ object Middleware {
                 }
             }
             uuid2name[uuid] = name
-            FiFuMiningList.plugin.logger.info("成功为玩家 $name 加载统计数据")
+            MiningList.plugin.logger.info("成功为玩家 $name 加载统计数据")
             val mineBlockNum = BigInteger(oldMineBlockNum.toString())
             putData(uuid, mineBlockNum.toString())
         }

@@ -1,5 +1,5 @@
 name: FiFuMiningList
-main: fun.fifu.mininglist.FiFuMiningList
+main: fun.fifu.mininglist.MiningList
 version: 1.0.0
 author: NekokeCore
 commands:

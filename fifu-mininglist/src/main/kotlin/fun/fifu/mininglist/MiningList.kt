@@ -17,10 +17,10 @@ import org.bukkit.scoreboard.Scoreboard
 import java.math.BigInteger
 
 
-class FiFuMiningList : JavaPlugin(), Listener {
+class MiningList : JavaPlugin(), Listener {
 
     companion object {
-        lateinit var plugin: FiFuMiningList
+        lateinit var plugin: MiningList
         lateinit var emptyScoreboard: Scoreboard
     }
 
@@ -64,7 +64,6 @@ class FiFuMiningList : JavaPlugin(), Listener {
         return true
     }
 
-
     @EventHandler
     private fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
@@ -78,7 +77,6 @@ class FiFuMiningList : JavaPlugin(), Listener {
         num = BigInteger(num).add(BigInteger.ONE).toString()
         Middleware.putData(uuid, num)
     }
-
 
     fun loadBoard() {
         try {
