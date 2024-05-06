@@ -13,7 +13,6 @@ plugins {
 subprojects {
     apply {
         plugin("java")
-        plugin("org.jetbrains.kotlin.jvm")
         plugin("com.github.johnrengelman.shadow")
     }
 
@@ -27,10 +26,7 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
         implementation(fileTree("./lib"))
-
-        testImplementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
 

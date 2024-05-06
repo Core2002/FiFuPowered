@@ -1,4 +1,5 @@
-dependencies{
+apply{
+    plugin("org.jetbrains.kotlin.jvm")
 }
 
 tasks.withType<Jar>{
