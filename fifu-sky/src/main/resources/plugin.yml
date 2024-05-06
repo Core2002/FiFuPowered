@@ -2,7 +2,7 @@ main: fun.fifu.fifusky.FiFuSky
 version: 2.33
 name: FiFuSky
 author: NekokeCore
-api-version: 1.16
+api-version: 1.20
 commands:
   s:
     description: "主命令"

@@ -12,8 +12,7 @@ main: fun.fifu.bookedit.BookEdit
 version: 2.33
 name: BookEdit
 author: NekokeCore
-# 接高版本插件定制，小白的QQ：3513353936
-api-version: 1.13
+api-version: 1.20
 commands:
   book:
     description: "主命令"

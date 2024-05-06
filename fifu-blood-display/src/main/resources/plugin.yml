@@ -2,4 +2,4 @@ main: fun.fifu.bloodvolumedisplay.BloodVolumeDisplay
 version: 1.0
 name: FiFuBloodVolumeDisplay
 author: NekokeCore
-api-version: 1.16
+api-version: 1.20
