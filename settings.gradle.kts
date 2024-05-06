@@ -1,5 +1,5 @@
 rootProject.name = "FiFuPowered"
 include("fifu-sky")
-include("fifu-bookedit")
-include("fifu-mininglist")
-include("fifu-nekomark")
+include("fifu-book-editor")
+include("fifu-mining-list")
+include("fifu-neko-mark")
