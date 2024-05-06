@@ -1,0 +1,8 @@
+main: fun.fifu.nekomark.NekoMark
+version: 2.33
+name: FiFuNekoMark
+author: NekokeCore
+commands:
+  neko-mark:
+    description: "小白印记"
+    usage: /neko-mark <操作符> <参数>
