@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 val kotlin_version: String by project
 val junit_version:String by project
 val lombok_version:String by project
@@ -34,6 +36,10 @@ subprojects {
 
         compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
         compileOnly("org.projectlombok:lombok:$lombok_version")
+    }
+
+    tasks.withType<ShadowJar>{
+        destinationDirectory = file("$rootDir/build/libs")
     }
 
     tasks {
