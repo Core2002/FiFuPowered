@@ -45,7 +45,7 @@ object Middleware {
         }
     }
 
-    fun uninit() {
+    fun unInit() {
         saveConfigFile(data, "data")
         saveConfigFile(uuid2name, "uuid2name")
         saveConfigFile(ignore, "ignore")

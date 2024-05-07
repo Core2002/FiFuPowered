@@ -45,7 +45,7 @@ class MiningList : JavaPlugin(), Listener {
 
     override fun onDisable() {
         br.cancel()
-        Middleware.uninit()
+        Middleware.unInit()
         server.logger.info("挖掘榜插件已卸载，感谢使用，")
     }
 
