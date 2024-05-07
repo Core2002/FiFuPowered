@@ -225,7 +225,7 @@ class SkyCommand : TabExecutor {
         }
         if (p3.size == 1) {
             val sb = StringBuilder().append("可用的生物群系有：\n")
-            Biome.values()
+            Biome.entries
                 .forEachIndexed { index, biome -> sb.append(index).append('：').append(biome.name).append('\n') }
             sb.append("你脚下的方块的生物群系是：").append(p0.location.block.getRelative(BlockFace.DOWN).biome.name)
             p0.sendMessage(sb.toString())
@@ -233,7 +233,7 @@ class SkyCommand : TabExecutor {
         }
         try {
             val biome = if (p3[1].isInt()) {
-                Biome.values()[p3[1].toInt()]
+                Biome.entries[p3[1].toInt()]
             } else {
                 Biome.valueOf(p3[1])
             }

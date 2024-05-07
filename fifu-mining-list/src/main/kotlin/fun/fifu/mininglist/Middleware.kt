@@ -90,7 +90,7 @@ object Middleware {
     fun putUuid2Name(uuid: String, name: String) {
         if (!uuid2name.contains(uuid)) {
             var oldMineBlockNum = 0
-            for (m in Material.values()) {
+            for (m in Material.entries) {
                 if (m.isBlock) {
                     oldMineBlockNum +=
                         Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getStatistic(Statistic.MINE_BLOCK, m)
