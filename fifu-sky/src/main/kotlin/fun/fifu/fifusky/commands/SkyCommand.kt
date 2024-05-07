@@ -67,8 +67,9 @@ class SkyCommand : TabExecutor {
         "remove-member" to "/s remove-member <玩家名> 把目标玩家从你所在的岛里移除",
         "renounce" to "/s renounce 放弃你所在的岛屿",
         "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
-        "chunk" to "例：/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
+        "chunk" to "/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
 //        "view-all" to "/s view-all [index=0] 参观别人的岛屿,默认起点是index=0",
+        "set-home" to "/s set-home 变更/s的默认传送岛屿为当前所在的岛屿",
         "tpa" to "/s tpa [玩家名] 接受传送/请求传送到[玩家名]"
     )
 
@@ -138,6 +139,7 @@ class SkyCommand : TabExecutor {
                 "chunk" -> onChunk(p0, p3)
 //                "view-all" -> onViewAll(p0, p3)
                 "tpa" -> onTpa(p0, p3)
+                "set-home" -> onSetHome(p0)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -145,6 +147,20 @@ class SkyCommand : TabExecutor {
             onHelp(p0, arrayOf("help", p3[0]))
             FiFuSky.fs.logger.warning("$p0 的命令 /s ${p3.contentToString()} 导致了一个异常：")
             e.printStackTrace()
+            return true
+        }
+        return true
+    }
+
+    private fun onSetHome(p0: Player): Boolean {
+        val island = Sky.getIsland(p0.location.blockX, p0.location.blockZ).toString()
+        val homeOwners = p0.getIslandHomes().first
+        val homeMembers = p0.getIslandHomes().second
+        if (homeOwners.contains(island) || homeMembers.contains(island)){
+            SQLiteer.savePlayerIndex(p0.uniqueId.toString(), island)
+            p0.sendMessage("成功变更默认传送岛屿为：$island ，使用/s可来回传送")
+        }else{
+            p0.sendMessage("你不是岛屿 $island 的所有者或成员，无权操作")
             return true
         }
         return true
