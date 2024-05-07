@@ -30,7 +30,7 @@ class MiningList : JavaPlugin(), Listener {
 
     private lateinit var br: BukkitTask
     override fun onEnable() {
-        emptyScoreboard = Bukkit.getServer().scoreboardManager!!.newScoreboard
+        emptyScoreboard = Bukkit.getServer().scoreboardManager.newScoreboard
         Middleware.init()
         for (p in server.onlinePlayers)
             Middleware.putUuid2Name(p.uniqueId.toString(), p.displayName)
@@ -80,7 +80,7 @@ class MiningList : JavaPlugin(), Listener {
 
     fun loadBoard() {
         try {
-            val scoreboard: Scoreboard = Bukkit.getServer().scoreboardManager!!.newScoreboard
+            val scoreboard: Scoreboard = Bukkit.getServer().scoreboardManager.newScoreboard
             val objective: Objective = scoreboard.registerNewObjective(Middleware.pluginName, "dummy", "挖掘榜")
             objective.displaySlot = DisplaySlot.SIDEBAR
             var size = Middleware.ranking.size

@@ -55,13 +55,13 @@ public class NekoMark extends JavaPlugin implements Listener {
                 if (lore == null) {
                     lore = new ArrayList<>();
                 }
-                Player shouquan = this.getServer().getPlayer(args[1]);
-                String shouquanuuid = (Objects.requireNonNull(shouquan)).getUniqueId().toString();
-                NekoMark.yinji(lore, shouquanuuid);
+                Player owner = this.getServer().getPlayer(args[1]);
+                String ownerUUID = (Objects.requireNonNull(owner)).getUniqueId().toString();
+                NekoMark.makeMark(lore, ownerUUID);
                 itemMeta.setLore(lore);
                 mainHandItemStack.setItemMeta(itemMeta);
                 inventory.setItemInMainHand(mainHandItemStack);
-                player.sendMessage("已刻上了" + args[1] + "的印记:" + shouquanuuid);
+                player.sendMessage("已刻上了" + args[1] + "的印记:" + ownerUUID);
                 return true;
             }
             return true;
@@ -80,13 +80,13 @@ public class NekoMark extends JavaPlugin implements Listener {
         List<String> lore = itemMeta.getLore();
         if (lore == null)
             return;
-        if (!NekoMark.hefa(lore, event.getPlayer().getUniqueId().toString())) {
+        if (!NekoMark.hasMark(lore, event.getPlayer().getUniqueId().toString())) {
             event.getPlayer().kickPlayer("持有物品不合法");
             event.setCancelled(true);
         }
     }
 
-    public static void yinji(List<String> lore, String uuid) {
+    public static void makeMark(List<String> lore, String uuid) {
         for (String l : lore) {
             if (!l.contains(uuid)) continue;
             return;
@@ -94,7 +94,7 @@ public class NekoMark extends JavaPlugin implements Listener {
         lore.add("小白印记:" + uuid);
     }
 
-    public static boolean hefa(List<String> lore, String uuid) {
+    public static boolean hasMark(List<String> lore, String uuid) {
         for (String l : lore) {
             if (!l.contains("小白印记")) continue;
             for (String i : lore) {
