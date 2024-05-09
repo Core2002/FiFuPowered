@@ -48,11 +48,5 @@ class BookEdit : JavaPlugin(), Listener {
     companion object {
         lateinit var fs: BookEdit
         val pluginName = "FiFuBookEdit"
-        @JvmStatic
-        fun main(args: Array<String>) {
-            println(
-                "小白最可耐啊喵@光擦黑".split('@')[0]
-            )
-        }
     }
 }
