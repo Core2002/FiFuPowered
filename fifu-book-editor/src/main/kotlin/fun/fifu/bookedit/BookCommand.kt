@@ -12,6 +12,7 @@ See the Mulan PSL v2 for more details.
 
 package `fun`.fifu.bookedit
 
+import `fun`.fifu.bookedit.BookEdit.Companion.pluginName
 import `fun`.fifu.bookedit.BookOperator.copyBook
 import `fun`.fifu.bookedit.BookOperator.exportBook
 import `fun`.fifu.bookedit.BookOperator.importBook
@@ -51,7 +52,7 @@ class BookCommand : TabExecutor {
         return when (p3[0]) {
             "import-book", "view-book" -> {
                 bookFiles.clear()
-                File("plugins/BookEdit/").listFiles()?.forEach {
+                File("plugins/$pluginName/").listFiles()?.forEach {
                     if (it.isFile)
                         bookFiles.add(it.nameWithoutExtension)
                 }
@@ -61,7 +62,7 @@ class BookCommand : TabExecutor {
 
             "export-book" -> {
                 bookFiles.clear()
-                File("plugins/BookEdit/").listFiles()?.forEach {
+                File("plugins/$pluginName/").listFiles()?.forEach {
                     if (it.isFile)
                         bookFiles.add(it.nameWithoutExtension.split('@')[0])
                 }
@@ -91,7 +92,7 @@ class BookCommand : TabExecutor {
             p0.sendMessage("你必须是一名玩家")
             return true
         }
-        if (p3.isNullOrEmpty()) return onHelp(p0, p3)
+        if (p3.isEmpty()) return onHelp(p0, p3)
         try {
             val re = when (p3[0]) {
                 "help" -> onHelp(p0, p3)
@@ -119,12 +120,12 @@ class BookCommand : TabExecutor {
             return true
 
         if (p3.size <= 2) {
-            p0.openBook(importBook("plugins/BookEdit/${p3[1].filt()}.txt", Material.WRITTEN_BOOK))
+            p0.openBook(importBook("plugins/$pluginName/${p3[1].filt()}.txt", Material.WRITTEN_BOOK))
             p0.sendMessage("正在浏览书 ${p3[1].filt()}")
         } else {
             if (p0.isOp) {
                 val player = Bukkit.getPlayer(p3[2])
-                player?.openBook(importBook("plugins/BookEdit/${p3[1].filt()}.txt", Material.WRITTEN_BOOK))
+                player?.openBook(importBook("plugins/$pluginName/${p3[1].filt()}.txt", Material.WRITTEN_BOOK))
                 player?.sendMessage("正在浏览书 ${p3[1].filt()}")
             } else {
                 p0.sendMessage("只有OP才有这个权限")
@@ -138,7 +139,7 @@ class BookCommand : TabExecutor {
             return false
         if (!bookFiles.contains(p3[1]))
             return true
-        p0.inventory.addItem(importBook("plugins/BookEdit/${p3[1].filt()}.txt"))
+        p0.inventory.addItem(importBook("plugins/$pluginName/${p3[1].filt()}.txt"))
         p0.sendMessage("成功导入书 ${p3[1].filt()}")
         return true
     }
@@ -148,7 +149,7 @@ class BookCommand : TabExecutor {
             p0.sendMessage("你主手必须持有 书/书与笔")
         }
         if (bookMeta is BookMeta) {
-            bookMeta.exportBook("plugins/BookEdit/${p3[1].filt()}@${p0.name}_${myDateTimeFormatter.format(LocalDateTime.now())}.txt")
+            bookMeta.exportBook("plugins/$pluginName/${p3[1].filt()}@${p0.name}_${myDateTimeFormatter.format(LocalDateTime.now())}.txt")
             p0.sendMessage("成功导出书 ${p3[1].filt()}")
         }
         return true

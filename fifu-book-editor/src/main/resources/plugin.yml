@@ -10,7 +10,7 @@
 
 main: fun.fifu.bookedit.BookEdit
 version: 2.33
-name: BookEdit
+name: FiFuBookEdit
 author: NekokeCore
 api-version: 1.20
 commands:

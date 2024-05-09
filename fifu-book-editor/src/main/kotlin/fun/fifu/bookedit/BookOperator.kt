@@ -12,6 +12,7 @@ See the Mulan PSL v2 for more details.
 
 package `fun`.fifu.bookedit
 
+import `fun`.fifu.bookedit.BookEdit.Companion.pluginName
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -54,8 +55,8 @@ object BookOperator {
         bookMeta.pages = list
         val book = ItemStack(type)
         if (type == Material.WRITTEN_BOOK) {
-            bookMeta.title = "Viewing for BookEdit"
-            bookMeta.author = "BookEdit by NekokeCore"
+            bookMeta.title = "Viewing for $pluginName"
+            bookMeta.author = "$pluginName by NekokeCore"
         }
         book.itemMeta = bookMeta
         return book

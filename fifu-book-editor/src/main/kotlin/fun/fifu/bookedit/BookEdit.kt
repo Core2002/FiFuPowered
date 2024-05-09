@@ -25,11 +25,11 @@ import java.io.File
 class BookEdit : JavaPlugin(), Listener {
     override fun onLoad() {
         fs = this
-        File("plugins/BookEdit/").mkdirs()
+        File("plugins/$pluginName/").mkdirs()
     }
 
     override fun onEnable() {
-        logger.info("欢迎使用BookEdit，author: NekokeCore")
+        logger.info("欢迎使用$pluginName，author: NekokeCore")
         server.pluginManager.registerEvents(this, this)
         Bukkit.getPluginCommand("book")?.setExecutor(BookCommand())
     }
@@ -47,7 +47,7 @@ class BookEdit : JavaPlugin(), Listener {
 
     companion object {
         lateinit var fs: BookEdit
-
+        val pluginName = "FiFuBookEdit"
         @JvmStatic
         fun main(args: Array<String>) {
             println(
