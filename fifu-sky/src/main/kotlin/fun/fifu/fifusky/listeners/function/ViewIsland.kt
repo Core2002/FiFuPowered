@@ -12,10 +12,15 @@
 
 package `fun`.fifu.fifusky.listeners.function
 
+import cn.hutool.core.io.FileUtil
+import cn.hutool.core.io.IORuntimeException
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.SQLiteer
+import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.getIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.getOwnersList
 import `fun`.fifu.fifusky.operators.SkyOperator.tpIsland
@@ -28,6 +33,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.scheduler.BukkitRunnable
 
+
 /**
  * 参观岛屿模块
  * @author NekokeCore
@@ -39,6 +45,21 @@ class ViewIsland : Listener {
     companion object {
         val canViewIsland: MutableList<Island> = SQLiteer.getAllSkyLoc()
         val viewingAllIndex: MutableMap<String, Int> = mutableMapOf()
+
+        const val starIslandPath = "~/star_island.json"
+        var stars = mutableSetOf<Island>()
+        val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+
+        init {
+            try {
+                val readUtf8String = FileUtil.readUtf8String(starIslandPath)
+                if (readUtf8String.isNotEmpty())
+                    stars = gson.fromJson(readUtf8String, Array<Island>::class.java).toMutableSet()
+            } catch (_: IORuntimeException) {
+                FileUtil.touch(starIslandPath)
+            }
+
+        }
 
         /**
          * 带领参观所有的岛屿
@@ -120,29 +141,39 @@ class ViewIsland : Listener {
 
     }
 
-    var tags = mutableSetOf<Island>()
-
     /**
      * 标记岛屿的功能
      * 副手手持弈颗星，左键标记，右键取消，左击方块输出到控制台
      */
     @EventHandler
-    fun makeTag(event: PlayerInteractEvent) {
-        if (event.player.inventory.itemInOffHand != FiFuItems.theStar())
+    fun makeStar(event: PlayerInteractEvent) {
+        val player = event.player
+        if (player.inventory.itemInOffHand != FiFuItems.theStar())
             return
+
+        val island = player.location.getIsland()
         when (event.action) {
             Action.LEFT_CLICK_AIR -> {
-                tags.add(event.player.location.getIsland())
-                event.player.sendMessage("已从tags添加当前岛屿，现在共添加了 ${tags.size} 个岛屿")
+                if (stars.contains(island)) {
+                    stars.remove(island)
+                    player.sendMessage("已将 $island 添加至Star，目前共 ${stars.size} 个岛屿")
+                } else {
+                    stars.add(island)
+                    player.sendMessage("已将 $island 从Star移除，目前共 ${stars.size} 个岛屿")
+                }
+                FileUtil.writeUtf8String(gson.toJson(stars).toString(), starIslandPath)
             }
-            Action.RIGHT_CLICK_AIR -> {
-                tags.remove(event.player.location.getIsland())
-                event.player.sendMessage("已从tags移除当前岛屿，现在共添加了 ${tags.size} 个岛屿")
+
+            Action.RIGHT_CLICK_BLOCK -> {
+                val currentIsland = player.currentIsland()
+                if (stars.contains(currentIsland)) {
+                    val currentIndex = stars.indexOf(currentIsland)
+                    val nextIndex = if (currentIndex + 1 >= stars.size) 0 else currentIndex + 1
+                    player.tpIsland(stars.elementAt(nextIndex))
+                    player.sendMessage("[ ${nextIndex + 1} / ${stars.size} ] ${island.getOwnersList()} -> $island")
+                }
             }
-            Action.LEFT_CLICK_BLOCK -> {
-                FiFuSky.fs.logger.info(tags.toString())
-                event.player.sendMessage("已将tags发送至控制台，共 ${tags.size} 个岛屿")
-            }
+
             else -> return
         }
     }
