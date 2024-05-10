@@ -16,22 +16,18 @@ import cn.hutool.core.io.FileUtil
 import cn.hutool.core.io.IORuntimeException
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.Island
-import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.SQLiteer
 import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.getIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.getOwnersList
 import `fun`.fifu.fifusky.operators.SkyOperator.tpIsland
 import org.bukkit.GameMode
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
-import org.bukkit.scheduler.BukkitRunnable
 
 
 /**
@@ -59,43 +55,6 @@ class ViewIsland : Listener {
                 FileUtil.touch(starIslandPath)
             }
 
-        }
-
-        /**
-         * 带领参观所有的岛屿
-         * @param player 要参观岛屿的玩家
-         * @param index 从哪里开始参观
-         */
-        fun startViewAll(player: Player, index: Int = 0) {
-            if (viewingAllIndex.contains(player.uniqueId.toString())) {
-                player.sendMessage("冷却中... ${((viewingAllIndex[player.uniqueId.toString()]!! + 1.0) / canViewIsland.size) * 100} %")
-                return
-            }
-            viewingAllIndex[player.uniqueId.toString()] = index
-            val listIterator = if (index < canViewIsland.size) {
-                canViewIsland.listIterator(index)
-            } else {
-                canViewIsland.listIterator(0)
-            }
-
-            player.sendMessage("你正在参观岛屿，退出游戏即可退出。")
-            object : BukkitRunnable() {
-                override fun run() {
-                    if (!listIterator.hasNext()) {
-                        this.cancel()
-                        viewingAllIndex.remove(player.uniqueId.toString())
-                        player.tpIsland(Sky.SPAWN)
-                        player.gameMode = GameMode.SURVIVAL
-                        player.sendMessage("参观结束")
-                        return
-                    }
-                    player.gameMode = GameMode.SPECTATOR
-                    viewingAllIndex[player.uniqueId.toString()] = listIterator.nextIndex()
-                    val next = listIterator.next()
-                    player.tpIsland(next)
-                    player.sendMessage("${canViewIsland.indexOf(next)} / ${canViewIsland.indices.last} : ${next.SkyLoc} ${next.getOwnersList()}")
-                }
-            }.runTaskTimer(FiFuSky.fs, 0, 20L * 10)
         }
     }
 

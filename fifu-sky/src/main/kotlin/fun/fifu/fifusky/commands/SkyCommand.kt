@@ -17,7 +17,6 @@ import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
-import `fun`.fifu.fifusky.listeners.function.ViewIsland
 import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.Spawn
 import `fun`.fifu.fifusky.operators.SkyOperator.addOwner
@@ -149,7 +148,6 @@ class SkyCommand : TabExecutor {
                 "renounce" -> onRenounce(p0, p3)
                 "biome" -> onBiome(p0, p3)
                 "chunk" -> onChunk(p0, p3)
-//                "view-all" -> onViewAll(p0, p3)
                 "tpa" -> onTpa(p0, p3)
                 "set-home" -> onSetHome(p0)
                 else -> false
@@ -188,14 +186,6 @@ class SkyCommand : TabExecutor {
             else
                 p0.sendMessage("玩家 ${p3[1]} 不在线")
         }
-        return true
-    }
-
-    private fun onViewAll(p0: Player, p3: Array<out String>): Boolean {
-        if (p3.size == 2)
-            ViewIsland.startViewAll(p0, p3[1].toInt())
-        else
-            ViewIsland.startViewAll(p0)
         return true
     }
 
