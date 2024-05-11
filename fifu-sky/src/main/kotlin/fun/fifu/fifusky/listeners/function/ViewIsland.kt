@@ -106,9 +106,9 @@ class ViewIsland : Listener {
      */
     @EventHandler
     fun makeStar(event: PlayerInteractEvent) {
-        val player = event.player
-        if (player.inventory.itemInOffHand != FiFuItems.theStar())
+        if (event.player.inventory.itemInOffHand != FiFuItems.theStar() || !event.player.hasPermission("fifu.sky.starview"))
             return
+        val player = event.player
 
         val island = player.location.getIsland()
         when (event.action) {
