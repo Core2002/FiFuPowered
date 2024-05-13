@@ -24,14 +24,13 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.scheduler.BukkitRunnable
 
 /**
- * 权限组：实体监听器
+ * 实体监听器
  * @author NekokeCore
  */
 class EntityListener : Listener {
     /**
-     * 实体受伤时触发
-     * 保护非怪物不被没有权限的玩家伤害
-     *
+     * 实体被攻击时触发
+     * 显血
      * @param event
      */
     @EventHandler
