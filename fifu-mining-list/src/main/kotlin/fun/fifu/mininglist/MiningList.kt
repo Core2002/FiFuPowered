@@ -90,6 +90,24 @@ class MiningList : JavaPlugin(), Listener {
         Middleware.putData(uuid, num)
     }
 
+    private fun get1Line(rank: Int): String {
+        return "§fNo.${rank}: §b" + Middleware.uuid2name(Middleware.ranking[rank - 1]) +
+                " §e" + Middleware.readData(Middleware.ranking[rank - 1])
+    }
+
+    private fun get2Line(rank: Int): String {
+        val r = rank / 2 + rank % 2
+        val source = Pair(
+            "§a${r}§d | §f" + Middleware.uuid2name(Middleware.ranking[r - 1]),
+            "   §e" + Middleware.readData(Middleware.ranking[r - 1])
+        )
+        return if (rank % 2 == 0) {
+            source.second
+        } else {
+            source.first
+        }
+    }
+
     fun loadBoard() {
         try {
             val scoreboard: Scoreboard = Bukkit.getServer().scoreboardManager.newScoreboard
@@ -100,13 +118,10 @@ class MiningList : JavaPlugin(), Listener {
                 size = 16
             else if (size == 0)
                 return
-            for (x in 0 until size)
-                objective.getScore(
-                    "§fNo.${size - x}: §b" + Middleware.uuid2name(Middleware.ranking[size - x - 1]) + " §e" + Middleware.readData(
-                        Middleware.ranking[size - x - 1]
-                    )
-                ).score =
-                    x
+            for (x in 0 until size) {
+                val line = get2Line(size - x)
+                objective.getScore(line).score = x
+            }
             for (p in server.onlinePlayers) {
                 if (Middleware.inIgnore(p.uniqueId.toString())) {
                     if (p.scoreboard != emptyScoreboard)
