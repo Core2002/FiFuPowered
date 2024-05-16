@@ -34,10 +34,15 @@ class MiningList : JavaPlugin(), Listener {
     companion object {
         lateinit var plugin: MiningList
         lateinit var emptyScoreboard: Scoreboard
+        lateinit var miningListConfig: MiningListConfig
     }
+
+    data class MiningListConfig(var displayTwoLines: Boolean)
 
     override fun onLoad() {
         plugin = this
+        ConfigCenter.makeDefaultConfig("config", MiningListConfig(false))
+        miningListConfig = ConfigCenter.readSnapshot("config", MiningListConfig::class.java)
     }
 
     private lateinit var br: BukkitTask
@@ -119,7 +124,11 @@ class MiningList : JavaPlugin(), Listener {
             else if (size == 0)
                 return
             for (x in 0 until size) {
-                val line = get2Line(size - x)
+                val line = if (miningListConfig.displayTwoLines) {
+                    get2Line(size - x)
+                } else {
+                    get1Line(size - x)
+                }
                 objective.getScore(line).score = x
             }
             for (p in server.onlinePlayers) {
