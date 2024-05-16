@@ -79,7 +79,6 @@ class SkyCommand : TabExecutor {
         "renounce" to "/s renounce 放弃你所在的岛屿",
         "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
         "chunk" to "/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
-//        "view-all" to "/s view-all [index=0] 参观别人的岛屿,默认起点是index=0",
         "set-home" to "/s set-home 变更/s的默认传送岛屿为当前所在的岛屿",
         "tpa" to "/s tpa [玩家名] 接受传送/请求传送到[玩家名]"
     )
