@@ -1,0 +1,5 @@
+main: fun.fifu.serverbackup.ServerBackup
+version: 1.0
+name: FiFuServerBackup
+author: NekokeCore
+api-version: 1.19
