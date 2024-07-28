@@ -31,6 +31,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class NekoMark extends JavaPlugin implements Listener {
     public static Plugin plugin;
 
+    /**
+     * 处理命令执行的函数。
+     * 当玩家发送特定的命令时，这个函数将被调用，用于解析并执行相应的操作。
+     *
+     * @param sender  命令的发送者，可以是玩家或服务器中的其他实体。
+     * @param command 被发送的命令对象。
+     * @param label   命令的标签，即命令的名称。
+     * @param args    命令的参数，用于指定具体的命令动作。
+     * @return 命令处理的结果，true表示命令被成功处理，false表示处理失败或不适用。
+     */
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if ("neko-mark".equalsIgnoreCase(command.getName())) {
             Player player = (Player) sender;
@@ -81,6 +91,13 @@ public class NekoMark extends JavaPlugin implements Listener {
         return false;
     }
 
+    /**
+     * 处理玩家使用物品的事件。
+     * 当玩家使用物品时，此事件会被触发。此方法检查玩家所使用的物品是否具有合法的NekoMark标记。
+     * 如果物品不合法，玩家将被踢出游戏。
+     *
+     * @param event 此事件包含有关玩家交互的所有信息，如玩家、使用的物品等。
+     */
     @EventHandler
     public static void onUse(PlayerInteractEvent event) {
         if (event.getItem() == null) {
@@ -98,6 +115,14 @@ public class NekoMark extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * 为指定的UUID在lore列表中添加标记。
+     * 如果lore中已经存在包含该UUID的字符串，则不进行任何操作。
+     * 如果lore中不存在包含该UUID的字符串，则将新字符串添加到lore列表末尾。
+     *
+     * @param lore 一个字符串列表，用于存储标记信息。
+     * @param uuid 需要添加标记的唯一标识符。
+     */
     public static void makeMark(List<String> lore, String uuid) {
         for (String l : lore) {
             if (!l.contains(uuid)) continue;
@@ -106,6 +131,13 @@ public class NekoMark extends JavaPlugin implements Listener {
         lore.add("小白印记:" + uuid);
     }
 
+    /**
+     * 检查lore列表中是否包含指定的uuid标记。
+     *
+     * @param lore 一个字符串列表，代表了某种记录或描述。
+     * @param uuid 要查找的特定标记，是一个唯一标识符。
+     * @return 如果lore中存在包含"小白印记"且同时包含指定uuid的字符串，则返回true；否则返回false。
+     */
     public static boolean hasMark(List<String> lore, String uuid) {
         for (String l : lore) {
             if (!l.contains("小白印记")) continue;
@@ -126,6 +158,13 @@ public class NekoMark extends JavaPlugin implements Listener {
         super.onDisable();
     }
 
+    /**
+     * 当插件启用时调用此方法。
+     * 插件启用时的主要任务包括：
+     * 1. 输出启动信息，让管理员知道插件已经成功启动。
+     * 2. 注册命令执行器，使得可以通过命令行调用插件的功能。
+     * 3. 注册事件监听器，以便插件可以响应服务器中发生的各种事件。
+     */
     public void onEnable() {
         this.getLogger().info("小白印记插件已启动");
         this.getServer().getPluginCommand("neko-mark").setExecutor(this);
