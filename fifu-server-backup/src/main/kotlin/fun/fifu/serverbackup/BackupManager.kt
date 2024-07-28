@@ -39,7 +39,7 @@ object BackupManager {
                 val timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 val backupName = "./backup_${LocalDateTime.now().format(timeFormatter)}.tar.gz"
                 createTarGzipByFolder(Paths.get(configPojo.backupServerDirPath), Paths.get(backupName))
-                println("压缩完毕，文件保存在${backupName}")
+                println("The compression is complete, and the file is saved in ${backupName}.")
             }
         }
         checkCanBackup = Runnable {
@@ -50,6 +50,15 @@ object BackupManager {
         }
     }
 
+    /**
+     * Creates a tar.gz compressed file from the contents of a specified folder.
+     *
+     * @param source The path of the folder to be packed.
+     * @param target The path of the resulting tar.gz file.
+     * This function walks through all files and subfolders in the source folder,
+     * packaging them into a single tar.gz compressed file.
+     * It handles recursive packing of files and folders as well as symbolic link processing.
+     */
     fun createTarGzipByFolder(source: Path, target: Path) {
         Files.newOutputStream(target).use { fileOut ->
             BufferedOutputStream(fileOut).use { buffOut ->
