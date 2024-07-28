@@ -22,8 +22,11 @@ import org.json.simple.parser.JSONParser
 import java.io.File
 
 object BookOperator {
+
     /**
-     * 复制一本书与笔
+     * 复制一本书的元数据，并返回一个新的ItemStack。
+     *
+     * @return 一个具有相同页面的可写书的ItemStack。
      */
     fun BookMeta.copyBook(): ItemStack {
         val bookMeta = Bukkit.getItemFactory().getItemMeta(Material.WRITABLE_BOOK) as BookMeta
@@ -34,20 +37,27 @@ object BookOperator {
     }
 
     /**
-     * 导出书到文件
-     * @param path 要导出的书的路径
+     * 将书的页面数据导出到指定路径的文件中。
+     *
+     * @param path 文件的路径。
      */
     fun BookMeta.exportBook(path: String) = File(path).writeText(JSONArray.toJSONString(this.pages))
 
     /**
-     * 从文件导入书
-     * @param path 要从哪个路径导入
+     * 从指定路径的文件中导入书的页面数据，并创建相应的书。
+     *
+     * @param path 文件的路径。
+     * @param type 导入后书的材质，默认为可写书。
+     * @return 一个具有导入页面的书的ItemStack。
      */
     fun importBook(path: String, type: Material = Material.WRITABLE_BOOK) = makeBook(File(path).readText(), type)
 
     /**
-     * 使用字符串创建一个书与笔
-     * @param text 书的内容
+     * 根据提供的文本和材质类型创建一本书籍物品。
+     *
+     * @param text 书籍的页面内容，以JSON格式的字符串表示。
+     * @param type 书籍的材质类型，默认为可书写的书籍。
+     * @return 创建的书籍物品Stack。
      */
     fun makeBook(text: String, type: Material = Material.WRITABLE_BOOK): ItemStack {
         val list = JSONParser().parse(text) as List<String>
