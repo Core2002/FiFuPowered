@@ -43,9 +43,10 @@ object BackupManager {
             }
         }
         checkCanBackup = Runnable {
-            isTimeToDoBackup = configPojo.enableBackup && configPojo.nextBackupTime > System.currentTimeMillis()
+            isTimeToDoBackup = configPojo.enableBackup && System.currentTimeMillis() > configPojo.nextBackupTime
             if (isTimeToDoBackup) {
                 doBackup.run()
+                configPojo.nextBackupTime = System.currentTimeMillis() + 1000 * 60 * 60 * 24
             }
         }
     }
