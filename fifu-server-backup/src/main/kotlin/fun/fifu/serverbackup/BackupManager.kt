@@ -12,7 +12,6 @@
 
 package `fun`.fifu.serverbackup
 
-import com.google.gson.JsonPrimitive
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
@@ -54,7 +53,7 @@ object BackupManager {
                 ConfigCenter.setValue(
                     cacheFileName,
                     "nextBackupTime",
-                    JsonPrimitive(System.currentTimeMillis() + 1000 * 60 * 60 * 24)
+                    ConfigCenter.convertToJsonPrimitive(System.currentTimeMillis() + 1000 * 60 * 60 * 24)
                 )
             }
         }

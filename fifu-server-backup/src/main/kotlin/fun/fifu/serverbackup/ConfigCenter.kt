@@ -15,6 +15,7 @@ package `fun`.fifu.serverbackup
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import java.io.File
 
 object ConfigCenter {
@@ -64,6 +65,25 @@ object ConfigCenter {
             element = JsonObject()
         }
         return element
+    }
+
+    /**
+     * Converts the given value to a JsonPrimitive object.
+     * This function supports conversion of Boolean, Number, String, and Char types to JsonPrimitive.
+     * If the value passed in is of an unsupported type, an IllegalArgumentException is thrown.
+     *
+     * @param value The value to convert to JsonPrimitive.
+     * @return The resulting JsonPrimitive object.
+     * @throws IllegalArgumentException if the type of the value is not supported.
+     */
+    fun convertToJsonPrimitive(value: Any): JsonPrimitive {
+        return when (value) {
+            is Boolean -> JsonPrimitive(value)
+            is Number -> JsonPrimitive(value)
+            is String -> JsonPrimitive(value)
+            is Char -> JsonPrimitive(value)
+            else -> throw IllegalArgumentException("Unsupported type: ${value::class.java.name}")
+        }
     }
 
     fun setValue(fileName: String, key: String, value: JsonElement) {
