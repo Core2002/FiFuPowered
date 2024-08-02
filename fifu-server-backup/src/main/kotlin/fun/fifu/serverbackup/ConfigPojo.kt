@@ -32,11 +32,6 @@ data class ConfigPojo(
     var backupKeepDay: Int = 7,
 
     /**
-     * 下一次备份的时间戳（毫秒）。默认为0，表示未设置。
-     */
-    var nextBackupTime: Long = 0,
-
-    /**
      * 是否将备份文件发送到远程服务器。默认为false。
      */
     var sendToRemoteServer: Boolean = false,

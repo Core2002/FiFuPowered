@@ -12,6 +12,7 @@
 
 package `fun`.fifu.serverbackup
 
+import com.google.gson.JsonPrimitive
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
@@ -29,6 +30,7 @@ object BackupManager {
     var doBackup: Runnable
     var checkCanBackup: Runnable
     val configFileName = "ServerBackupConfig"
+    val cacheFileName = "ServerBackupCache"
     var configPojo: ConfigPojo
 
     init {
@@ -43,10 +45,17 @@ object BackupManager {
             }
         }
         checkCanBackup = Runnable {
-            isTimeToDoBackup = configPojo.enableBackup && System.currentTimeMillis() > configPojo.nextBackupTime
+            isTimeToDoBackup = configPojo.enableBackup && System.currentTimeMillis() > ConfigCenter.getValue(
+                cacheFileName,
+                "nextBackupTime"
+            ).asLong
             if (isTimeToDoBackup) {
                 doBackup.run()
-                configPojo.nextBackupTime = System.currentTimeMillis() + 1000 * 60 * 60 * 24
+                ConfigCenter.setValue(
+                    cacheFileName,
+                    "nextBackupTime",
+                    JsonPrimitive(System.currentTimeMillis() + 1000 * 60 * 60 * 24)
+                )
             }
         }
     }
