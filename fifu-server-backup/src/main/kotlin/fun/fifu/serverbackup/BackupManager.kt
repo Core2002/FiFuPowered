@@ -16,10 +16,15 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.BufferedOutputStream
+import java.io.File
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
+import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import kotlin.concurrent.thread
 import kotlin.io.path.isDirectory
 
@@ -41,6 +46,11 @@ object BackupManager {
                 val backupName = "./backup_${LocalDateTime.now().format(timeFormatter)}.tar.gz"
                 createTarGzipByFolder(Paths.get(configPojo.backupServerDirPath), Paths.get(backupName))
                 println("The compression is complete, and the file is saved in ${backupName}.")
+                val key = ByteArray(32) { SecureRandom().nextInt().toByte() }
+                val iv = ByteArray(16) { SecureRandom().nextInt().toByte() }
+                encryptFile(backupName, "$backupName.enc", key, iv)
+                File(backupName).delete()
+                println("key is ${byteArrayToHexString(key)} , iv is ${byteArrayToHexString(iv)}")
             }
         }
         checkCanBackup = Runnable {
@@ -57,6 +67,18 @@ object BackupManager {
                 )
             }
         }
+    }
+
+    fun hexStringToByteArray(hex: String): ByteArray {
+        val byteArray = ByteArray(hex.length / 2)
+        for (i in hex.indices step 2) {
+            byteArray[i / 2] = hex.substring(i, i + 2).toInt(16).toByte()
+        }
+        return byteArray
+    }
+
+    fun byteArrayToHexString(byteArray: ByteArray): String {
+        return byteArray.joinToString("") { "%02x".format(it) }
     }
 
     /**
@@ -96,6 +118,51 @@ object BackupManager {
                 }
             }
         }
+    }
+
+    /**
+     * Encrypts a file using the AES encryption algorithm.
+     *
+     * This function encrypts a specified file using the AES/CBC/PKCS5Padding mode and saves the encrypted file to the specified path.
+     * CBC mode requires an initialization vector (IV), which is specified through an IvParameterSpec in this function.
+     *
+     * @param inputPath The path of the input file.
+     * @param outputPath The path of the output file.
+     * @param key The encryption key, which must be a byte array of 32 bytes, used to generate a SecretKeySpec.
+     * @param iv The initialization vector, which must be a byte array of 16 bytes, used to generate an IvParameterSpec.
+     */
+    fun encryptFile(inputPath: String, outputPath: String, key: ByteArray, iv: ByteArray) {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        val secretKey = SecretKeySpec(key, "AES")
+        val ivParameterSpec = IvParameterSpec(iv)
+
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
+
+        val inputBytes = Files.readAllBytes(Paths.get(inputPath))
+        val encryptedBytes = cipher.doFinal(inputBytes)
+
+        Files.write(Paths.get(outputPath), encryptedBytes)
+    }
+
+    /**
+     * Decrypts a file using AES-CBC mode with PKCS5 padding.
+     *
+     * @param inputPath The path to the input file that needs to be decrypted.
+     * @param outputPath The path to the output file where the decrypted content will be written.
+     * @param key The key used for decryption.
+     * @param iv The initialization vector used to start the decryption process.
+     */
+    fun decryptFile(inputPath: String, outputPath: String, key: ByteArray, iv: ByteArray) {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        val secretKey = SecretKeySpec(key, "AES")
+        val ivParameterSpec = IvParameterSpec(iv)
+
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
+
+        val inputBytes = Files.readAllBytes(Paths.get(inputPath))
+        val decryptedBytes = cipher.doFinal(inputBytes)
+
+        Files.write(Paths.get(outputPath), decryptedBytes)
     }
 
 }
