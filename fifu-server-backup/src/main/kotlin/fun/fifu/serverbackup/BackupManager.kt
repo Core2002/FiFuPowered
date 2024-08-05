@@ -12,11 +12,15 @@
 
 package `fun`.fifu.serverbackup
 
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import java.io.BufferedOutputStream
 import java.io.File
+import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.security.SecureRandom
@@ -48,8 +52,10 @@ object BackupManager {
                 println("The compression is complete, and the file is saved in ${backupName}.")
                 val key = ByteArray(32) { SecureRandom().nextInt().toByte() }
                 val iv = ByteArray(16) { SecureRandom().nextInt().toByte() }
-                encryptFile(backupName, "$backupName.enc", key, iv)
+                val encryptedBackupName = "$backupName.enc"
+                encryptFile(backupName, encryptedBackupName, key, iv)
                 File(backupName).delete()
+                if (configPojo.sendToRemoteServer) uploadFile(encryptedBackupName, configPojo.sendRemoteServerUrl)
                 println("key is ${byteArrayToHexString(key)} , iv is ${byteArrayToHexString(iv)}")
             }
         }
@@ -163,6 +169,35 @@ object BackupManager {
         val decryptedBytes = cipher.doFinal(inputBytes)
 
         Files.write(Paths.get(outputPath), decryptedBytes)
+    }
+
+    /**
+     * Uploads a file to the specified URL.
+     *
+     * @param filePath The path of the file to be uploaded.
+     * @param url The URL to which the file is uploaded.
+     * @throws IOException If the network request fails.
+     */
+    fun uploadFile(filePath: String, url: String) {
+        val client = OkHttpClient()
+
+        val file = File(filePath)
+        val fileBody = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+
+        val multipartBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("file", file.name, fileBody)
+            .build()
+
+        val request = Request.Builder()
+            .url(url)
+            .post(multipartBody)
+            .build()
+
+        client.newCall(request).execute().use { response: Response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            println(response.body?.string())
+        }
     }
 
 }
