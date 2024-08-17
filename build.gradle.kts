@@ -16,7 +16,7 @@ subprojects {
     }
 
     group = "fun.fifu.powered"
-    version = "1.0-SNAPSHOT"
+    version = "1.21-SNAPSHOT"
 
     repositories {
         maven("https://papermc.io/repo/repository/maven-public/")
