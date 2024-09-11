@@ -406,23 +406,8 @@ class SkyCommand : TabExecutor {
     }
 
     private fun onS(p0: Player): Boolean {
-        val island: Island = try {
-            SQLiteer.getPlayerIndex(p0.uniqueId.toString())
-        } catch (e: RuntimeException) {
-            var temp: Island
-            do {
-                val xx = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
-                val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
-                temp = Sky.getIsland(xx, zz)
-            } while (SQLiteer.getIslandData(temp).Privilege.Owner.isNotEmpty())
-            val iLD = SQLiteer.getIslandData(temp)
-            iLD.Privilege.Owner.add(PlayerData(p0.uniqueId.toString(), p0.name))
-            SkyOperator.playerGetOver(p0, iLD)
-            temp.build()
-            temp
-        }
+        val island = getOrGenerateIsland(p0)
 
-        // 如果玩家现在在主城，就回自己岛，不在主城就回主城
         if (Sky.isInIsland(p0.location.blockX, p0.location.blockZ, Sky.SPAWN)) {
             p0.sendMessage("欢迎回家")
             p0.tpIsland(island)
@@ -432,6 +417,30 @@ class SkyCommand : TabExecutor {
         }
         SoundPlayer.playCat(p0)
         return true
+    }
+
+    private fun getOrGenerateIsland(player: Player): Island {
+        return try {
+            SQLiteer.getPlayerIndex(player.uniqueId.toString())
+        } catch (e: RuntimeException) {
+            generateNewIsland(player)
+        }
+    }
+
+    private fun generateNewIsland(player: Player): Island {
+        var temp: Island
+        do {
+            val xx = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
+            val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
+            temp = Sky.getIsland(xx, zz)
+        } while (SQLiteer.getIslandData(temp).Privilege.Owner.isNotEmpty())
+
+        val iLD = SQLiteer.getIslandData(temp)
+        iLD.Privilege.Owner.add(PlayerData(player.uniqueId.toString(), player.name))
+        SkyOperator.playerGetOver(player, iLD)
+        temp.build()
+
+        return temp
     }
 
     /**
