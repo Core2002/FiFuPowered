@@ -18,13 +18,13 @@ import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.*
 import cn.hutool.core.date.DateUtil
 import `fun`.fifu.utils.ActionbarUtil
-import org.apache.commons.lang3.time.DateUtils
 import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * 岛屿操作者单例，内聚了很多操作以及方法扩展
@@ -50,7 +50,7 @@ object SkyOperator {
         val islandCenter = Sky.getIslandCenter(island)
         teleport(
             Location(
-                Bukkit.getWorld("world"),
+                Bukkit.getWorld(Sky.WORLD),
                 islandCenter.first.toDouble(),
                 65.0,
                 islandCenter.second.toDouble(),
@@ -60,133 +60,87 @@ object SkyOperator {
         )
         sendTitle(island.toString(), "主人 ${island.getOwnersList()}", 2, 20 * 3, 6)
         SoundPlayer.playCat(this)
+
+        val bedrock = Location(
+            Bukkit.getWorld(Sky.WORLD),
+            islandCenter.first.toDouble(),
+            60.0,
+            islandCenter.second.toDouble()
+        ).block
+        if (bedrock.type == Material.AIR) bedrock.type = Material.BEDROCK
     }
 
     /**
      * 构建一个岛屿，将模板岛屿复制到目标岛屿
      */
     fun Island.build() {
-        val t = System.currentTimeMillis()
-        //准备工作
+        val startTime = System.currentTimeMillis()
         val ic = Sky.getIslandCenter(this)
-        val world = Bukkit.getWorld(Sky.WORLD)
+        val world = Bukkit.getWorld(Sky.WORLD) ?: return
 
-        //原点偏移
-        val xx = -3
-        val yy = -4
-        val zz = -1
-        //顶点1
-        val x1 = 508
-        val y1 = 60
-        val z1 = 510
-        //顶点2
-        val x2 = 515
-        val y2 = 69
-        val z2 = 516
-        //目标原点
-        val xxx = X + Sky.SIDE / 2 + xx.toDouble()
-        val yyy = 64 + yy.toDouble()
-        val zzz = Y + Sky.SIDE / 2 + zz.toDouble()
-        //生成执行命令
+        // 偏移量
+        val (xx, yy, zz) = Triple(-3, -4, -1)
+
+        // 顶点坐标
+        val (x1, y1, z1) = Triple(508, 60, 510)
+        val (x2, y2, z2) = Triple(515, 69, 516)
+
+        // 目标原点
+        val (xxx, yyy, zzz) = Triple(X + Sky.SIDE / 2 + xx.toDouble(), 64 + yy.toDouble(), Y + Sky.SIDE / 2 + zz.toDouble())
+
+        // 生成执行命令
         val command = "clone $x1 $y1 $z1 $x2 $y2 $z2 ${xxx.toInt()} ${yyy.toInt()} ${zzz.toInt()}"
-        //自动加载区块
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world!!.getChunkAt(Location(world, xxx, yyy, zzz))
-                .load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, (xxx + 16), yyy,
-                    zzz
-                )
-            ).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, (xxx - 16), yyy,
-                    zzz
-                )
-            ).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, xxx, yyy,
-                    (zzz + 16)
-                )
-            ).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, xxx, yyy,
-                    (zzz - 16)
-                )
-            ).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, (xxx + 16), yyy,
-                    (zzz + 16)
-                )
-            ).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, (xxx - 16), yyy,
-                    (zzz - 16)
-                )
-            ).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, (xxx + 16), yyy,
-                    (zzz + 16)
-                )
-            ).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk.load:" + world.getChunkAt(
-                Location(
-                    world, (xxx - 16), yyy,
-                    (zzz - 16)
-                )
-            ).load(true)
-        )
 
-        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0, 64.0, 511.0)).load(true))
-        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0 + 16, 64.0, 511.0)).load(true))
-        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0 - 16, 64.0, 511.0)).load(true))
-        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0, 64.0, 511.0 + 16)).load(true))
-        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0, 64.0, 511.0 - 16)).load(true))
-        FiFuSky.fs.logger.info(
-            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 + 16, 64.0, 511.0 + 16)).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 - 16, 64.0, 511.0 - 16)).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 + 16, 64.0, 511.0 + 16)).load(true)
-        )
-        FiFuSky.fs.logger.info(
-            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 - 16, 64.0, 511.0 - 16)).load(true)
-        )
-        //开始拷贝初始空岛
+        // 自动加载区块
+        loadChunks(world, xxx, yyy, zzz, 16)
+
+        // 开始拷贝初始空岛
         Bukkit.getScheduler().runTask(FiFuSky.fs, Runnable {
-            FiFuSky.fs.logger.info("开始拷贝初始空岛:$command")
+            FiFuSky.fs.logger.info("开始拷贝初始空岛: $command")
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
             world.getBlockAt(ic.first, 60, ic.second).setType(Material.BEDROCK, true)
-            FiFuSky.fs.logger.info("复制完毕！$this 耗时 ${System.currentTimeMillis() - t} ms。")
+            FiFuSky.fs.logger.info("复制完毕！耗时 ${System.currentTimeMillis() - startTime} ms。")
         })
 
         FiFuSky.fs.logger.info("调度完毕！")
     }
 
+    /**
+     * 加载区块
+     *
+     * @param world 世界对象，用于确定区块所属的世界
+     * @param x X坐标，用于确定初始位置
+     * @param y Y坐标，用于确定初始位置
+     * @param z Z坐标，用于确定初始位置
+     * @param chunkSize 区块大小，用于确定加载区块的范围
+     */
+    private fun loadChunks(world: World, x: Double, y: Double, z: Double, chunkSize: Int) {
+        val locations = listOf(
+            Location(world, x, y, z),
+            Location(world, x + chunkSize, y, z),
+            Location(world, x - chunkSize, y, z),
+            Location(world, x, y, z + chunkSize),
+            Location(world, x, y, z - chunkSize),
+            Location(world, x + chunkSize, y, z + chunkSize),
+            Location(world, x - chunkSize, y, z - chunkSize),
+            Location(world, x + chunkSize, y, z + chunkSize),
+            Location(world, x - chunkSize, y, z - chunkSize),
+            Location(world, 511.0, 64.0, 511.0),
+            Location(world, 511.0 + chunkSize, 64.0, 511.0),
+            Location(world, 511.0 - chunkSize, 64.0, 511.0),
+            Location(world, 511.0, 64.0, 511.0 + chunkSize),
+            Location(world, 511.0, 64.0, 511.0 - chunkSize),
+            Location(world, 511.0 + chunkSize, 64.0, 511.0 + chunkSize),
+            Location(world, 511.0 - chunkSize, 64.0, 511.0 - chunkSize),
+            Location(world, 511.0 + chunkSize, 64.0, 511.0 + chunkSize),
+            Location(world, 511.0 - chunkSize, 64.0, 511.0 - chunkSize)
+        )
+
+        locations.forEach { location ->
+            val chunk = world.getChunkAt(location)
+            FiFuSky.fs.logger.info("chunk.load: ${chunk.load(true)}")
+        }
+    }
 
     /**
      * 遍历一个三维空间
@@ -365,7 +319,7 @@ object SkyOperator {
     fun Player.canGetIsland(): Pair<Boolean, String> {
         val uuid = uniqueId.toString()
         val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
-        val lgy = DateUtils.MILLIS_PER_HOUR * 48
+        val lgy = MILLISECONDS.toHours(48)
         return Pair(time > lgy, DateUtil.formatBetween(lgy - time))
     }
 
