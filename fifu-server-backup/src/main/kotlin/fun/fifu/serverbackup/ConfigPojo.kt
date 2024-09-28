@@ -39,7 +39,7 @@ data class ConfigPojo(
     /**
      * 远程服务器的URL地址。默认为空字符串。
      */
-    var sendRemoteServerUrl: String = "http://localhost:8080/upload",
+    var sendRemoteServerUrl: String = "http://localhost:6542/upload",
 
     /**
      * 令牌，用于验证身份。默认为空字符串。
