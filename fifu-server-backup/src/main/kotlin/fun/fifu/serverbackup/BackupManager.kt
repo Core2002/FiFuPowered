@@ -12,9 +12,17 @@
 
 package `fun`.fifu.serverbackup
 
-import okhttp3.*
+import dev.samstevens.totp.code.DefaultCodeGenerator
+import dev.samstevens.totp.code.HashingAlgorithm
+import dev.samstevens.totp.secret.DefaultSecretGenerator
+import dev.samstevens.totp.secret.SecretGenerator
+import dev.samstevens.totp.time.SystemTimeProvider
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.Response
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
@@ -192,12 +200,26 @@ object BackupManager {
         val request = Request.Builder()
             .url(url)
             .post(multipartBody)
+            .addHeader("Authorization", getTOTPCode())
             .build()
 
         client.newCall(request).execute().use { response: Response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
-            println(response.body?.string())
+            println("ok! ${response.body?.string()}")
         }
+    }
+
+    private fun getTOTPCode(): String {
+        if (configPojo.sendRemoteServerSecret == "" || configPojo.sendRemoteServerSecret.length < 64) {
+            val secretGenerator: SecretGenerator = DefaultSecretGenerator(64)
+            val secret = secretGenerator.generate()
+            configPojo.sendRemoteServerSecret = secret
+            ConfigCenter.setValue(configFileName, "sendRemoteServerSecret", ConfigCenter.convertToJsonPrimitive(secret))
+        }
+        val codeGenerator = DefaultCodeGenerator(HashingAlgorithm.SHA512)
+        val timeProvider = SystemTimeProvider()
+
+        return codeGenerator.generate(configPojo.sendRemoteServerSecret, timeProvider.time.floorDiv(30))
     }
 
 }

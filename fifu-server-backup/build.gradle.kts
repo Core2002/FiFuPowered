@@ -8,6 +8,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.vertx:vertx-core:4.5.9")
     implementation("io.vertx:vertx-web:4.5.9")
+    implementation("dev.samstevens.totp:totp:1.7.1")
+    implementation("commons-net:commons-net:3.9.0")
 }
 
 tasks.withType<Jar> {
