@@ -97,6 +97,13 @@ object BackupManager {
         }
     }
 
+    /**
+     * Converts a hexadecimal string to a byte array.
+     * Each pair of hexadecimal characters is converted to its corresponding byte value.
+     *
+     * @param hex The hexadecimal string to be converted.
+     * @return The resulting byte array after conversion.
+     */
     fun hexStringToByteArray(hex: String): ByteArray {
         val byteArray = ByteArray(hex.length / 2)
         for (i in hex.indices step 2) {
@@ -105,7 +112,14 @@ object BackupManager {
         return byteArray
     }
 
-    fun byteArrayToHexString(byteArray: ByteArray): String {
+    /**
+     * Converts a byte array to a hexadecimal string.
+     * This function aims to generate a readable string representation of the byte array, commonly used for data debugging or logging.
+     *
+     * @param byteArray The byte array containing the data to be converted.
+     * @return The resulting hexadecimal string after conversion.
+     */
+    private fun byteArrayToHexString(byteArray: ByteArray): String {
         return byteArray.joinToString("") { "%02x".format(it) }
     }
 
@@ -223,6 +237,16 @@ object BackupManager {
         }
     }
 
+
+    /**
+     * Generates a Time-based One-Time Password (TOTP).
+     *
+     * This function generates a dynamic one-time password based on the server key stored in the configuration center and the current time.
+     * If the configuration center does not store a key or the stored key length is less than 64 characters, a new key will be generated and updated in the configuration center.
+     * After generating the key, a one-time password is generated using the SHA-512 hashing algorithm and the current time.
+     *
+     * @return A string representing the generated one-time password.
+     */
     private fun getTOTPCode(): String {
         if (configPojo.sendRemoteServerSecret == "" || configPojo.sendRemoteServerSecret.length < 64) {
             val secretGenerator: SecretGenerator = DefaultSecretGenerator(64)
@@ -236,6 +260,13 @@ object BackupManager {
         return codeGenerator.generate(configPojo.sendRemoteServerSecret, timeProvider.time.floorDiv(30))
     }
 
+    /**
+     * Calculates the SHA-512 hash value of a given file path.
+     *
+     * @param filePath The path to the file.
+     * @return A string representing the SHA-512 hash value of the file.
+     * @throws RuntimeException If the SHA-512 hash value of the file cannot be calculated.
+     */
     private fun calculateSha512(filePath: String): String {
         return try {
             val bytes = Files.readAllBytes(Paths.get(filePath))
