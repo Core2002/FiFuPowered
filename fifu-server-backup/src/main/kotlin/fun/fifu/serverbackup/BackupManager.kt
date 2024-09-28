@@ -12,6 +12,7 @@
 
 package `fun`.fifu.serverbackup
 
+import com.google.gson.JsonElement
 import dev.samstevens.totp.code.DefaultCodeGenerator
 import dev.samstevens.totp.code.HashingAlgorithm
 import dev.samstevens.totp.secret.DefaultSecretGenerator
@@ -31,6 +32,7 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
+import java.security.MessageDigest
 import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -47,6 +49,7 @@ object BackupManager {
     var checkCanBackup: Runnable
     val configFileName = "ServerBackupConfig"
     val cacheFileName = "ServerBackupCache"
+    val keysFileName = "ServerBackupKeys"
     var configPojo: ConfigPojo
 
     init {
@@ -63,8 +66,19 @@ object BackupManager {
                 val encryptedBackupName = "$backupName.enc"
                 encryptFile(backupName, encryptedBackupName, key, iv)
                 File(backupName).delete()
+                val sha512 = calculateSha512(encryptedBackupName)
                 if (configPojo.sendToRemoteServer) uploadFile(encryptedBackupName, configPojo.sendRemoteServerUrl)
-                println("key is ${byteArrayToHexString(key)} , iv is ${byteArrayToHexString(iv)}")
+                ConfigCenter.setValue(
+                    keysFileName, sha512, ConfigCenter.gson.fromJson(
+                        ConfigCenter.gson.toJson(
+                            mapOf(
+                                "name" to encryptedBackupName,
+                                "key" to byteArrayToHexString(key),
+                                "iv" to byteArrayToHexString(iv)
+                            )
+                        ), JsonElement::class.java
+                    )
+                )
             }
         }
         checkCanBackup = Runnable {
@@ -220,6 +234,17 @@ object BackupManager {
         val timeProvider = SystemTimeProvider()
 
         return codeGenerator.generate(configPojo.sendRemoteServerSecret, timeProvider.time.floorDiv(30))
+    }
+
+    private fun calculateSha512(filePath: String): String {
+        return try {
+            val bytes = Files.readAllBytes(Paths.get(filePath))
+            val md: MessageDigest = MessageDigest.getInstance("SHA-512")
+            val messageDigest = md.digest(bytes)
+            messageDigest.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to calculate SHA-512 for $filePath", e)
+        }
     }
 
 }

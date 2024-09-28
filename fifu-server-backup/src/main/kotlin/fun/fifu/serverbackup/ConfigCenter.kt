@@ -12,15 +12,12 @@
 
 package `fun`.fifu.serverbackup
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
+import com.google.gson.*
 import java.io.File
 
 object ConfigCenter {
     private val pluginName = "FiFuServerBackup"
-    private val gson = GsonBuilder().setPrettyPrinting().create()
+    val gson: Gson = GsonBuilder().setPrettyPrinting().create()
     private var jsonFiles = HashMap<String, Pair<File, JsonObject>>()
 
     private fun getConfigObject(fileName: String): JsonObject {
