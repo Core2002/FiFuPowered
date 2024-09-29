@@ -27,9 +27,7 @@ import okhttp3.Response
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.IOException
+import java.io.*
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.security.MessageDigest
@@ -37,6 +35,7 @@ import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.concurrent.thread
@@ -61,24 +60,9 @@ object BackupManager {
                 val backupName = "./backup_${LocalDateTime.now().format(timeFormatter)}.tar.gz"
                 createTarGzipByFolder(Paths.get(configPojo.backupServerDirPath), Paths.get(backupName))
                 println("The compression is complete, and the file is saved in ${backupName}.")
-                val key = ByteArray(32) { SecureRandom().nextInt().toByte() }
-                val iv = ByteArray(16) { SecureRandom().nextInt().toByte() }
-                val encryptedBackupName = "$backupName.enc"
-                encryptFile(backupName, encryptedBackupName, key, iv)
-                File(backupName).delete()
-                val sha512 = calculateSha512(encryptedBackupName)
-                if (configPojo.sendToRemoteServer) uploadFile(encryptedBackupName, configPojo.sendRemoteServerUrl)
-                ConfigCenter.setValue(
-                    keysFileName, sha512, ConfigCenter.gson.fromJson(
-                        ConfigCenter.gson.toJson(
-                            mapOf(
-                                "name" to encryptedBackupName,
-                                "key" to byteArrayToHexString(key),
-                                "iv" to byteArrayToHexString(iv)
-                            )
-                        ), JsonElement::class.java
-                    )
-                )
+                if (configPojo.sendToRemoteServer) {
+                    uploadFileAndWriteRecord(backupName, configPojo.sendRemoteServerUrl)
+                }
             }
         }
         checkCanBackup = Runnable {
@@ -95,6 +79,36 @@ object BackupManager {
                 )
             }
         }
+    }
+
+    private fun uploadFileAndWriteRecord(backupName: String, remoteServerUrl: String) {
+        val fileSize = File(backupName).length()
+        if (fileSize > 128 * 1024 * 1024) {
+            splitAndUploadFile(backupName, remoteServerUrl, ::encryptFile, ::makeCord, ::uploadFile)
+        } else {
+            val key = ByteArray(32) { SecureRandom().nextInt().toByte() }
+            val iv = ByteArray(16) { SecureRandom().nextInt().toByte() }
+            val encryptedBackupName = "$backupName.enc"
+            encryptFile(backupName, encryptedBackupName, key, iv)
+            uploadFile(encryptedBackupName, remoteServerUrl)
+            makeCord(path = encryptedBackupName, key = key, iv = iv)
+        }
+        File(backupName).delete()
+    }
+
+    private fun makeCord(path: String, key: ByteArray, iv: ByteArray) {
+        val sha512 = calculateSha512(path)
+        ConfigCenter.setValue(
+            keysFileName, sha512, ConfigCenter.gson.fromJson(
+                ConfigCenter.gson.toJson(
+                    mapOf(
+                        "name" to path,
+                        "key" to byteArrayToHexString(key),
+                        "iv" to byteArrayToHexString(iv)
+                    )
+                ), JsonElement::class.java
+            )
+        )
     }
 
     /**
@@ -214,7 +228,7 @@ object BackupManager {
      * @param url The URL to which the file is uploaded.
      * @throws IOException If the network request fails.
      */
-    fun uploadFile(filePath: String, url: String) {
+    fun uploadFile(filePath: String, url: String, retry: Int = 3) {
         val client = OkHttpClient()
 
         val file = File(filePath)
@@ -232,8 +246,63 @@ object BackupManager {
             .build()
 
         client.newCall(request).execute().use { response: Response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            if (!response.isSuccessful) {
+                if (retry > 0) {
+                    println("文件${filePath}上传失败，正在重试，剩余重试次数：${retry - 1}")
+                    uploadFile(filePath, url, retry - 1)
+                    return
+                } else {
+                    throw IOException("Unexpected code $response")
+                }
+            }
             println("ok! ${response.body?.string()}")
+        }
+    }
+
+
+    fun splitAndUploadFile(
+        fileName: String,
+        url: String,
+        encryptFile: (inputPath: String, outputPath: String, key: ByteArray, iv: ByteArray) -> Unit,
+        cordFunction: (path: String, key: ByteArray, iv: ByteArray) -> Unit,
+        uploadFunction: (filePath: String, url: String) -> Unit,
+    ) {
+        val file = File(fileName)
+        if (!file.exists()) {
+            println("文件不存在，请检查路径是否正确")
+            return
+        }
+
+        val chunkSize = 128 * 1024 * 1024L // 128 MiB
+        val fileLength = file.length()
+        val chunksCount = (fileLength + chunkSize - 1) / chunkSize // 向上取整得到块的数量
+
+        RandomAccessFile(file, "r").use { raf ->
+            val fileChannel = raf.channel
+            for (i in 0 until chunksCount) {
+                val startOffset = i * chunkSize
+                val currentChunkSize = minOf(chunkSize, fileLength - startOffset)
+
+                // 创建带有序号的临时文件
+                val baseName = file.nameWithoutExtension
+                val extension = file.extension
+                val tempFileName = "${baseName}_${i}.${extension}"
+                val tempFile = File(file.parent, tempFileName)
+                tempFile.deleteOnExit() // 确保程序退出时删除临时文件
+
+                tempFile.outputStream().use { outputStream ->
+                    fileChannel.transferTo(startOffset, currentChunkSize, outputStream.channel)
+                }
+
+                val key = ByteArray(32) { SecureRandom().nextInt().toByte() }
+                val iv = ByteArray(16) { SecureRandom().nextInt().toByte() }
+                val encryptedBackupName = "$tempFileName.enc"
+                encryptFile(tempFileName, encryptedBackupName, key, iv)
+                File(tempFileName).delete()
+                cordFunction(encryptedBackupName, key, iv)
+                uploadFunction(encryptedBackupName, url)
+                File(encryptedBackupName).delete()
+            }
         }
     }
 
