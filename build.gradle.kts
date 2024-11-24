@@ -5,7 +5,7 @@ val junit_version:String by project
 val lombok_version:String by project
 
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.0.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -19,12 +19,12 @@ subprojects {
     version = "1.21-SNAPSHOT"
 
     repositories {
+        mavenLocal()
         maven("https://maven.aliyun.com/repository/public/")
         maven("https://maven.aliyun.com/repository/gradle-plugin/")
         maven("https://maven.aliyun.com/repository/apache-snapshots/")
         maven("https://papermc.io/repo/repository/maven-public/")
         maven("https://libraries.minecraft.net/")
-        google()
         mavenCentral()
     }
 
