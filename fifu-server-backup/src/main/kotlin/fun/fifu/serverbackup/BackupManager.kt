@@ -269,7 +269,7 @@ object BackupManager {
             .build()
 
         client.newCall(request).execute().use { response: Response ->
-            return response.isSuccessful && response.body.toString().contains(hash512)
+            return response.isSuccessful && response.body!!.string().contains(hash512)
         }
     }
 
