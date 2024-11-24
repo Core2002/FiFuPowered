@@ -245,7 +245,7 @@ object BackupManager {
             .build()
 
         client.newCall(request).execute().use { response: Response ->
-            if (!response.isSuccessful) {
+            if (!response.isSuccessful || !verifyHash(calculateSha512(filePath))) {
                 if (retry > 0) {
                     println("文件${filePath}上传失败，正在重试，剩余重试次数：${retry - 1}")
                     uploadFile(filePath, url, retry - 1)
@@ -258,6 +258,20 @@ object BackupManager {
         }
     }
 
+    private fun verifyHash(hash512: String): Boolean {
+        val client = OkHttpClient()
+        val url = "${configPojo.sendRemoteServerUrl}/hashtable"
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .addHeader("Authorization", getTOTPCode())
+            .build()
+
+        client.newCall(request).execute().use { response: Response ->
+            return response.isSuccessful && response.body.toString().contains(hash512)
+        }
+    }
 
     fun splitAndUploadFile(
         fileName: String,
@@ -335,7 +349,7 @@ object BackupManager {
      * @return A string representing the SHA-512 hash value of the file.
      * @throws RuntimeException If the SHA-512 hash value of the file cannot be calculated.
      */
-    private fun calculateSha512(filePath: String): String {
+    fun calculateSha512(filePath: String): String {
         return try {
             val bytes = Files.readAllBytes(Paths.get(filePath))
             val md: MessageDigest = MessageDigest.getInstance("SHA-512")

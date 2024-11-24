@@ -19,6 +19,9 @@ subprojects {
     version = "1.21-SNAPSHOT"
 
     repositories {
+        maven("https://maven.aliyun.com/repository/public/")
+        maven("https://maven.aliyun.com/repository/gradle-plugin/")
+        maven("https://maven.aliyun.com/repository/apache-snapshots/")
         maven("https://papermc.io/repo/repository/maven-public/")
         maven("https://libraries.minecraft.net/")
         google()
@@ -29,7 +32,7 @@ subprojects {
         implementation(fileTree("./lib"))
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
-        compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
         compileOnly("org.projectlombok:lombok:$lombok_version")
     }
 

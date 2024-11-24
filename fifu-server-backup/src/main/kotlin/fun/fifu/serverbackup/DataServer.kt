@@ -12,6 +12,8 @@
 
 package `fun`.fifu.serverbackup
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dev.samstevens.totp.code.DefaultCodeGenerator
 import dev.samstevens.totp.code.DefaultCodeVerifier
 import dev.samstevens.totp.code.HashingAlgorithm
@@ -22,7 +24,11 @@ import io.vertx.core.http.HttpServerOptions
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
+import java.io.File
 import java.nio.file.Paths
+import java.io.FileReader
+import java.io.FileWriter
+import java.util.concurrent.ConcurrentHashMap
 
 object DataServer {
     private val vertx = Vertx.vertx()
@@ -30,6 +36,34 @@ object DataServer {
     private val codeGenerator = DefaultCodeGenerator(HashingAlgorithm.SHA512)
     private val verifier = DefaultCodeVerifier(codeGenerator, timeProvider).apply {
         setAllowedTimePeriodDiscrepancy(3)
+    }
+
+    data class CacheEntry(val filePath: String, val hash: String)
+
+    private val hashCache = ConcurrentHashMap<String, String>()
+    private val cacheFile = File("plugins/hash_cache.json")
+    private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+
+    init {
+        loadCache()
+    }
+
+    private fun loadCache() {
+        if (cacheFile.exists()) {
+            val reader = FileReader(cacheFile)
+            val cacheEntries = gson.fromJson(reader, Array<CacheEntry>::class.java)
+            for (entry in cacheEntries) {
+                hashCache[entry.filePath] = entry.hash
+            }
+            reader.close()
+        }
+    }
+
+    private fun saveCache() {
+        val cacheEntries = hashCache.map { CacheEntry(it.key, it.value) }
+        val writer = FileWriter(cacheFile)
+        gson.toJson(cacheEntries, writer)
+        writer.close()
     }
 
     /**
@@ -51,6 +85,10 @@ object DataServer {
 
         // Enable body handling with file uploads going to a temporary directory
         router.route().handler(bodyHandler)
+
+        router.get("/upload/hashtable")
+            .handler(this::validateCode)
+            .handler(this::getHashTable)
 
         router.post("/upload")
             .handler(this::validateCode)
@@ -113,7 +151,6 @@ object DataServer {
         }
     }
 
-
     /**
      * Validates the client's access authorization.
      *
@@ -133,11 +170,39 @@ object DataServer {
             }
         } catch (e: Exception) {
             handleFileDeletion(routingContext)
-            routingContext.response().setStatusCode(402).end("Unauthorized, Has exception in ValidCode")
+            routingContext.response().setStatusCode(402).end("Invalid token")
             return
         }
 
         // If the code is valid, proceed to the next handler in the chain.
+        println("Authorization code is valid.")
         routingContext.next()
+    }
+
+    /**
+     * Get the HASH table of files in the upload directory
+     * This function responds to requests by providing the SHA-512 HASH values of all files in the upload directory
+     * It first checks if the upload directory exists, then iterates through each file in the directory
+     * For each file, it attempts to retrieve the HASH value from the cache; if not found, it calculates the HASH value and saves it to the cache
+     * Finally, it returns all HASH values as the response
+     *
+     * @param routingContext The routing context, containing request and response objects, used to handle HTTP requests and responses
+     */
+    private fun getHashTable(routingContext: RoutingContext) {
+        val uploadsDir = File("uploads")
+        val responseList = mutableSetOf<String>()
+        if (uploadsDir.isDirectory) {
+            for (file in uploadsDir.listFiles()!!) {
+                val filePath = file.absolutePath
+                val hash = hashCache[filePath] ?: run {
+                    val newHash = BackupManager.calculateSha512(filePath)
+                    hashCache[filePath] = newHash
+                    saveCache()
+                    newHash
+                }
+                responseList.add(hash)
+            }
+        }
+        routingContext.response().setStatusCode(200).end(gson.toJson(responseList))
     }
 }
