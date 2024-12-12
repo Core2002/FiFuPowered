@@ -22,6 +22,7 @@ import org.bukkit.event.block.*
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.world.PortalCreateEvent
 
 /**
  * 权限组：方块类权限处理
@@ -148,6 +149,18 @@ class BlockListener : Listener {
                 event.isCancelled = true
                 return
             }
+        }
+    }
+
+    /**
+     * 当一个传送门被创建时触发.
+     *
+     * @param event
+     */
+    @EventHandler
+    fun onPortalCreate(event: PortalCreateEvent) {
+        if (event.reason == PortalCreateEvent.CreateReason.NETHER_PAIR && event.world.isSkyWorld()) {
+            event.isCancelled = true
         }
     }
 
