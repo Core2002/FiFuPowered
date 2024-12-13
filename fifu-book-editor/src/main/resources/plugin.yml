@@ -9,10 +9,10 @@
 # See the Mulan PSL v2 for more details.
 
 main: fun.fifu.bookedit.BookEdit
-version: 2.33
+version: ${version}
+api-version: ${api_version}
 name: FiFuBookEdit
 author: NekokeCore
-api-version: 1.19
 commands:
   book:
     description: "主命令"

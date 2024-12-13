@@ -1,8 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val kotlin_version: String by project
-val junit_version:String by project
-val lombok_version:String by project
+val junit_version: String by project
+val lombok_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.21"
@@ -17,6 +17,7 @@ subprojects {
 
     group = "fun.fifu.powered"
     version = "1.21-SNAPSHOT"
+    val api_version = "1.19"
 
     repositories {
         mavenLocal()
@@ -36,11 +37,18 @@ subprojects {
         compileOnly("org.projectlombok:lombok:$lombok_version")
     }
 
-    tasks.withType<ShadowJar>{
+    tasks.withType<ShadowJar> {
         destinationDirectory = file("$rootDir/build/libs")
     }
 
     tasks {
+        processResources {
+            exclude("*.db")
+            expand(
+                "version" to project.version,
+                "api_version" to api_version
+            )
+        }
         build {
             dependsOn(shadowJar)
         }

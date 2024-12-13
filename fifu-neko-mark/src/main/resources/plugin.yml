@@ -1,8 +1,8 @@
 main: fun.fifu.nekomark.NekoMark
-version: 2.33
 name: FiFuNekoMark
+version: ${version}
+api-version: ${api_version}
 author: NekokeCore
-api-version: 1.19
 commands:
   neko-mark:
     description: "小白印记"

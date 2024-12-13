@@ -1,8 +1,8 @@
-name: FiFuMiningList
 main: fun.fifu.mininglist.MiningList
-version: 1.0.0
+name: FiFuMiningList
+version: ${version}
+api-version: ${api_version}
 author: NekokeCore
-api-version: 1.19
 commands:
   wjb:
     description: "打开或者关闭挖掘帮"

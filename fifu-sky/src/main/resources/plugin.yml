@@ -1,8 +1,8 @@
 main: fun.fifu.fifusky.FiFuSky
-version: 2.33
 name: FiFuSky
+version: ${version}
+api-version: ${api_version}
 author: NekokeCore
-api-version: 1.19
 commands:
   s:
     description: "主命令"
