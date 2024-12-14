@@ -16,8 +16,8 @@ subprojects {
     }
 
     group = "fun.fifu.powered"
-    version = "1.20.6-SNAPSHOT"
-    val api_version = "1.19"
+    version = "1.21.4-SNAPSHOT"
+    val api_version = "1.21"
 
     repositories {
         mavenLocal()
@@ -33,7 +33,7 @@ subprojects {
         implementation(fileTree("./lib"))
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
-        compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
         compileOnly("org.projectlombok:lombok:$lombok_version")
     }
 

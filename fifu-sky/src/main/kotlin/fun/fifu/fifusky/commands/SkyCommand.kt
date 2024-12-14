@@ -93,7 +93,7 @@ class SkyCommand : TabExecutor {
         }
         return when (p3[0]) {
             "biome" -> {
-                if (p3.size == 2) Biome.entries.forEach { ml.add(it.name) };ml
+                if (p3.size == 2) Biome.values().forEach { ml.add(it.name()) };ml
             }
             "chunk" -> {
                 if (p3.size == 2) ml.add("AllowExplosion")
@@ -226,20 +226,20 @@ class SkyCommand : TabExecutor {
         }
         if (p3.size == 1) {
             val sb = StringBuilder().append("可用的生物群系有：\n")
-            Biome.entries
-                .forEachIndexed { index, biome -> sb.append(index).append('：').append(biome.name).append('\n') }
-            sb.append("你脚下的方块的生物群系是：").append(p0.location.block.getRelative(BlockFace.DOWN).biome.name)
+            Biome.values()
+                .forEachIndexed { index, biome -> sb.append(index).append('：').append(biome.name()).append('\n') }
+            sb.append("你脚下的方块的生物群系是：").append(p0.location.block.getRelative(BlockFace.DOWN).biome.name())
             p0.sendMessage(sb.toString())
             return true
         }
         try {
             val biome = if (p3[1].isInt()) {
-                Biome.entries[p3[1].toInt()]
+                Biome.values()[p3[1].toInt()]
             } else {
                 Biome.valueOf(p3[1])
             }
             work(p0.chunk, biome)
-            p0.sendMessage("你已成功将区块 ${p0.chunk.toChunkLoc()} 的生物群系改为 ${biome.name}")
+            p0.sendMessage("你已成功将区块 ${p0.chunk.toChunkLoc()} 的生物群系改为 ${biome.name()}")
         } catch (e: Exception) {
             p0.sendMessage("输入有误： ${p3[1]} 不是一个有效的生物群系或编号")
         }

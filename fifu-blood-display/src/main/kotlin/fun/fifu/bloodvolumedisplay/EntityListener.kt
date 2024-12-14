@@ -68,7 +68,7 @@ class EntityListener : Listener {
         object : BukkitRunnable() {
             override fun run() {
                 val i = health.toInt()
-                val j = getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()
+                val j = getAttribute(Attribute.MAX_HEALTH)!!.value.toInt()
                 var color = "§f"
                 val c = i / 1.0 / j
                 if (c in 0.825..1.0) {

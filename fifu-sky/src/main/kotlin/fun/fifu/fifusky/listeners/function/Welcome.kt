@@ -29,7 +29,7 @@ class Welcome : Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        SQLiteer.savePlayerIp(event.player.uniqueId.toString(), event.player.address.hostName)
+        event.player.address?.hostName?.let { SQLiteer.savePlayerIp(event.player.uniqueId.toString(), it) }
         SQLiteer.savePlayerName(event.player.uniqueId.toString(), event.player.name)
         event.player.gameMode = GameMode.SURVIVAL
         try {
