@@ -16,7 +16,7 @@ subprojects {
     }
 
     group = "fun.fifu.powered"
-    version = "1.21-SNAPSHOT"
+    version = "1.20.6-SNAPSHOT"
     val api_version = "1.19"
 
     repositories {
@@ -33,7 +33,7 @@ subprojects {
         implementation(fileTree("./lib"))
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
-        compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
         compileOnly("org.projectlombok:lombok:$lombok_version")
     }
 
@@ -42,7 +42,14 @@ subprojects {
     }
 
     tasks {
+        register<Copy>("copyBinaryResources") {
+            from("src/main/resources") {
+                include("*.db")
+            }
+            into("build/resources/main")
+        }
         processResources {
+            dependsOn("copyBinaryResources")
             exclude("*.db")
             expand(
                 "version" to project.version,

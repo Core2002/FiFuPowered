@@ -36,7 +36,8 @@ class FiFuSky : JavaPlugin() {
      */
     override fun onLoad() {
         fs = this
-        if (!File("plugins/FiFuSky").isDirectory) {
+        val pluginDir = File("plugins/FiFuSky")
+        if (!pluginDir.exists() || !pluginDir.isDirectory) {
             saveResource("FiFuSky.db", false)
             saveResource("db.setting", false)
         }

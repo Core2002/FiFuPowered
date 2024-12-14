@@ -32,7 +32,7 @@ object SQLiteer {
     private const val SkyIsland = "SkyIsland"
 
     init {
-        DbUtil.setDbSettingPathGlobal(File(File(javaClass.protectionDomain.codeSource.location.path).absoluteFile.parentFile.path+"/FiFuSky/db.setting").absoluteFile.path)
+        DbUtil.setDbSettingPathGlobal(File("plugins/FiFuSky/db.setting").absolutePath)
     }
 
 
