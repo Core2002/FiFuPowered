@@ -86,7 +86,11 @@ object SkyOperator {
         val (x2, y2, z2) = Triple(515, 69, 516)
 
         // 目标原点
-        val (xxx, yyy, zzz) = Triple(X + Sky.SIDE / 2 + xx.toDouble(), 64 + yy.toDouble(), Y + Sky.SIDE / 2 + zz.toDouble())
+        val (xxx, yyy, zzz) = Triple(
+            X + Sky.SIDE / 2 + xx.toDouble(),
+            64 + yy.toDouble(),
+            Y + Sky.SIDE / 2 + zz.toDouble()
+        )
 
         // 生成执行命令
         val command = "clone $x1 $y1 $z1 $x2 $y2 $z2 ${xxx.toInt()} ${yyy.toInt()} ${zzz.toInt()}"
@@ -187,34 +191,6 @@ object SkyOperator {
      */
     fun World.isSkyWorld() = name == Sky.WORLD
 
-    /**
-     * 显示一个实体的血量给玩家
-     * @param player 要显示的玩家
-     */
-    fun LivingEntity.showDamage(player: Player) {
-        object : BukkitRunnable() {
-            override fun run() {
-                val i = health.toInt()
-                val j = getAttribute(Attribute.MAX_HEALTH)!!.value.toInt()
-                var color = "§f"
-                val c = i / 1.0 / j
-                if (c in 0.825..1.0) {
-                    color = "§a"
-                } else if (c < 0.825 && c >= 0.66) {
-                    color = "§2"
-                } else if (c < 0.66 && c >= 0.495) {
-                    color = "§e"
-                } else if (c < 0.495 && c >= 0.33) {
-                    color = "§6"
-                } else if (c < 0.33 && c >= 0.165) {
-                    color = "§c"
-                } else if (c < 0.165) {
-                    color = "§4"
-                }
-                player.sendTitle("", "$color$name->HP:$i/$j", 2, 20, 6)
-            }
-        }.runTaskLater(FiFuSky.fs, 1)
-    }
 
     /**
      * 检查岛屿是否是无人认领的

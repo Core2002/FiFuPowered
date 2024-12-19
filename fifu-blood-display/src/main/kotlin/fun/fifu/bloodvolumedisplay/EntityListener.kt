@@ -67,25 +67,19 @@ class EntityListener : Listener {
     private fun LivingEntity.showDamage(player: Player) {
         object : BukkitRunnable() {
             override fun run() {
-                val i = health.toInt()
-                val j = getAttribute(Attribute.MAX_HEALTH)!!.value.toInt()
-                var color = "§f"
-                val c = i / 1.0 / j
-                if (c in 0.825..1.0) {
-                    color = "§a"
-                } else if (c < 0.825 && c >= 0.66) {
-                    color = "§2"
-                } else if (c < 0.66 && c >= 0.495) {
-                    color = "§e"
-                } else if (c < 0.495 && c >= 0.33) {
-                    color = "§6"
-                } else if (c < 0.33 && c >= 0.165) {
-                    color = "§c"
-                } else if (c < 0.165) {
-                    color = "§4"
-                }
-//                player.sendTitle("", "$color$name->HP:$i/$j", 2, 20, 6)
-                ActionbarUtil.sendMessage(player, "$color$name->HP:$i/$j")
+                val currentHealth = health.toInt()
+                val maxHealth = getAttribute(Attribute.MAX_HEALTH)!!.value.toInt()
+                val ratio = currentHealth.toDouble() / maxHealth
+                val colorMap = mapOf(
+                    0.825..1.0 to "§a",
+                    0.66..0.825 to "§2",
+                    0.495..0.66 to "§e",
+                    0.33..0.495 to "§6",
+                    0.165..0.33 to "§c",
+                    0.0..0.165 to "§4"
+                )
+                val color = colorMap.entries.firstOrNull { it.key.contains(ratio) }?.value ?: "§f"
+                player.sendTitle("", "$color$name->HP:$currentHealth/$maxHealth", 2, 20, 6)
             }
         }.runTaskLater(BloodVolumeDisplay.plugin, 1)
     }
