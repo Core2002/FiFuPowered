@@ -19,6 +19,7 @@ import dev.samstevens.totp.code.DefaultCodeVerifier
 import dev.samstevens.totp.code.HashingAlgorithm
 import dev.samstevens.totp.time.SystemTimeProvider
 import `fun`.fifu.serverbackup.BackupManager.configPojo
+import `fun`.fifu.serverbackup.BackupManager.dataPatten
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServerOptions
 import io.vertx.ext.web.Router
@@ -28,7 +29,11 @@ import java.io.File
 import java.nio.file.Paths
 import java.io.FileReader
 import java.io.FileWriter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.ConcurrentHashMap
+import java.util.regex.Pattern
 
 object DataServer {
     private val vertx = Vertx.vertx()
@@ -46,6 +51,9 @@ object DataServer {
 
     init {
         loadCache()
+        vertx.setPeriodic(12 * 60 * 60 * 1000) {
+            scanExpiredFilesAndDeleted()
+        }
     }
 
     private fun loadCache() {
@@ -141,7 +149,7 @@ object DataServer {
             println("Received file: $fileName (size: $fileSize bytes)")
 
             // Move the file to a permanent location if needed
-            vertx.fileSystem().move(uploadedFileName, Paths.get("uploads", fileName).toString()) {
+            vertx.fileSystem().move(uploadedFileName, Paths.get(configPojo.backupServerDirPath, fileName).toString()) {
                 if (it.succeeded()) {
                     routingContext.response().end("File uploaded successfully")
                 } else {
@@ -204,5 +212,58 @@ object DataServer {
             }
         }
         routingContext.response().setStatusCode(200).end(gson.toJson(responseList))
+    }
+
+    /**
+     * Parses a date from the given filename and returns it as a LocalDate.
+     *
+     * This method attempts to extract a date string from the provided filename using a regular expression.
+     * If a valid date pattern is found, it parses the date string into a `LocalDate` object using the specified date format.
+     * If no valid date pattern is found or parsing fails, it returns null.
+     *
+     * @param filename The name of the file from which to extract the date.
+     * @return A `LocalDate` object representing the parsed date, or `null` if no valid date is found.
+     *
+     * @see dataPatten The date pattern used for parsing.
+     */
+    fun parseDateFromFilename(filename: String): LocalDate? {
+        val dateFormatter = DateTimeFormatter.ofPattern(dataPatten)
+
+        val datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}")
+        val matcher = datePattern.matcher(filename)
+
+        if (matcher.find()) {
+            val dateString = matcher.group()
+            return LocalDate.parse(dateString, dateFormatter)
+        }
+        return null
+    }
+
+    /**
+     * Scans the backup directory for expired files and deletes them.
+     *
+     * This method iterates through all files in the specified backup directory,
+     * checks if each file has exceeded the configured retention period, and deletes
+     * any files that are older than the retention period. It logs the deletion of
+     * each expired file and prints a completion message at the end.
+     *
+     * @see ConfigPojo.backupServerDirPath The path to the backup directory.
+     * @see ConfigPojo.backupKeepDay The number of days files should be retained before deletion.
+     */
+    private fun scanExpiredFilesAndDeleted() {
+        val files = File(configPojo.backupServerDirPath).listFiles()
+        for (file in files!!) {
+            if (file.isFile) {
+                val fileName = file.name
+                val date = parseDateFromFilename(fileName)
+                val currentDate = LocalDate.now()
+                val daysBetween = ChronoUnit.DAYS.between(date, currentDate)
+                if (daysBetween >= configPojo.backupKeepDay) {
+                    file.delete()
+                    println("Parsed Date: $date, Deleted.")
+                }
+            }
+        }
+        println("Scan expired files, Done.")
     }
 }

@@ -49,13 +49,14 @@ object BackupManager {
     val cacheFileName = "ServerBackupCache"
     val keysFileName = "ServerBackupKeys"
     var configPojo: ConfigPojo
+    val dataPatten = "yyyy-MM-dd"
 
     init {
         ConfigCenter.makeDefaultConfig(configFileName, ConfigPojo())
         configPojo = ConfigCenter.readSnapshot(configFileName, ConfigPojo::class.java)
         doBackup = Runnable {
             thread(start = true) {
-                val timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val timeFormatter = DateTimeFormatter.ofPattern(dataPatten)
                 val backupName = "./backup_${LocalDateTime.now().format(timeFormatter)}.tar.gz"
                 createTarGzipByFolder(Paths.get(configPojo.backupServerDirPath), Paths.get(backupName))
                 println("The compression is complete, and the file is saved in ${backupName}.")
