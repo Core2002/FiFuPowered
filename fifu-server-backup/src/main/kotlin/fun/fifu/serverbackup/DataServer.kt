@@ -252,15 +252,14 @@ object DataServer {
      */
     private fun scanExpiredFilesAndDeleted() {
         val files = File(configPojo.backupServerDirPath).listFiles()
+        val currentDate = LocalDate.now()
         for (file in files!!) {
             if (file.isFile) {
-                val fileName = file.name
-                val date = parseDateFromFilename(fileName)
-                val currentDate = LocalDate.now()
-                val daysBetween = ChronoUnit.DAYS.between(date, currentDate)
+                val fileDate = parseDateFromFilename(file.name)
+                val daysBetween = ChronoUnit.DAYS.between(fileDate, currentDate)
                 if (daysBetween >= configPojo.backupKeepDay) {
                     file.delete()
-                    println("Parsed Date: $date, Deleted.")
+                    println("Parsed Date: $fileDate, Deleted.")
                 }
             }
         }
