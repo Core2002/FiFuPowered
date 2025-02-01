@@ -12,6 +12,8 @@
 
 package `fun`.fifu.fifusky.commands
 
+import cn.hutool.cache.Cache
+import cn.hutool.cache.CacheUtil
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
@@ -21,15 +23,15 @@ import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.Spawn
 import `fun`.fifu.fifusky.operators.SkyOperator.addOwner
 import `fun`.fifu.fifusky.operators.SkyOperator.build
-import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
-import `fun`.fifu.fifusky.operators.SkyOperator.isOwnedIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.canGetIsland
+import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.getAllowExplosion
 import `fun`.fifu.fifusky.operators.SkyOperator.getIslandData
 import `fun`.fifu.fifusky.operators.SkyOperator.getIslandHomes
 import `fun`.fifu.fifusky.operators.SkyOperator.getMembersList
 import `fun`.fifu.fifusky.operators.SkyOperator.getOwnersList
 import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
+import `fun`.fifu.fifusky.operators.SkyOperator.isOwnedIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
 import `fun`.fifu.fifusky.operators.SkyOperator.isUnclaimed
 import `fun`.fifu.fifusky.operators.SkyOperator.removeOwner
@@ -38,18 +40,14 @@ import `fun`.fifu.fifusky.operators.SkyOperator.toChunkLoc
 import `fun`.fifu.fifusky.operators.SkyOperator.tpIsland
 import `fun`.fifu.fifusky.operators.SoundPlayer
 import `fun`.fifu.fifusky.operators.Tpaer
-import cn.hutool.cache.Cache
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
+import org.bukkit.block.Biome
+import org.bukkit.block.BlockFace
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
-import kotlin.random.Random
-import cn.hutool.cache.CacheUtil
-import org.bukkit.Chunk
-import org.bukkit.block.Biome
-import org.bukkit.block.BlockFace
-import java.lang.StringBuilder
 import java.util.*
 
 
@@ -95,6 +93,7 @@ class SkyCommand : TabExecutor {
             "biome" -> {
                 if (p3.size == 2) Biome.values().forEach { ml.add(it.name()) };ml
             }
+
             "chunk" -> {
                 if (p3.size == 2) ml.add("AllowExplosion")
                 if (p3.size == 3) {
@@ -103,11 +102,13 @@ class SkyCommand : TabExecutor {
                 }
                 ml
             }
+
             "tpa", "add-member", "remove-member" -> {
                 if (p3.size == 2)
                     ml.addAll(playersName)
                 ml
             }
+
             "go" -> {
                 if (p3.size == 2) {
                     ml.addAll(p0.getIslandHomes().first.split(' '))
@@ -115,11 +116,13 @@ class SkyCommand : TabExecutor {
                 }
                 ml
             }
+
             "help" -> {
                 if (p3.size == 2)
                     ml.addAll(helpMassage.keys)
                 ml
             }
+
             else -> ml
         }
     }
@@ -165,10 +168,10 @@ class SkyCommand : TabExecutor {
         val island = Sky.getIsland(p0.location.blockX, p0.location.blockZ).toString()
         val homeOwners = p0.getIslandHomes().first
         val homeMembers = p0.getIslandHomes().second
-        if (homeOwners.contains(island) || homeMembers.contains(island)){
+        if (homeOwners.contains(island) || homeMembers.contains(island)) {
             SQLiteer.savePlayerIndex(p0.uniqueId.toString(), island)
             p0.sendMessage("成功变更默认传送岛屿为：$island ，使用/s可来回传送")
-        }else{
+        } else {
             p0.sendMessage("你不是岛屿 $island 的所有者或成员，无权操作")
             return true
         }
@@ -200,10 +203,12 @@ class SkyCommand : TabExecutor {
                     p0.chunk.setAllowExplosion(true)
                     p0.sendMessage("区块 ${p0.chunk.toChunkLoc()} ${if (p0.chunk.getAllowExplosion()) "允许" else "不允许"} 爆炸")
                 }
+
                 "off" -> {
                     p0.chunk.setAllowExplosion(false)
                     p0.sendMessage("区块 ${p0.chunk.toChunkLoc()} ${if (p0.chunk.getAllowExplosion()) "允许" else "不允许"} 爆炸")
                 }
+
                 else -> p0.sendMessage(
                     """
                     当前所在区块是 ${p0.chunk.toChunkLoc()} 
@@ -427,12 +432,20 @@ class SkyCommand : TabExecutor {
         }
     }
 
+    private fun nextIsLand(skyLoc: Pair<Int, Int>): Island {
+        return if (skyLoc.first > -skyLoc.second) {
+            if (skyLoc.first < skyLoc.second) Sky.getIsland(skyLoc.first + 1, skyLoc.second)
+            else Sky.getIsland(skyLoc.first, skyLoc.second - 1)
+        } else {
+            if (skyLoc.first <= skyLoc.second) Sky.getIsland(skyLoc.first, skyLoc.second + 1)
+            else Sky.getIsland(skyLoc.first - 1, skyLoc.second)
+        }
+    }
+
     private fun generateNewIsland(player: Player): Island {
-        var temp: Island
+        var temp: Island = nextIsLand(Pair(0, 0))
         do {
-            val xx = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
-            val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
-            temp = Sky.getIsland(xx, zz)
+            temp = nextIsLand(temp.SkyLoc)
         } while (SQLiteer.getIslandData(temp).Privilege.Owner.isNotEmpty())
 
         val iLD = SQLiteer.getIslandData(temp)
