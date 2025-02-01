@@ -24,7 +24,7 @@ subprojects {
         maven("https://maven.aliyun.com/repository/public/")
         maven("https://maven.aliyun.com/repository/gradle-plugin/")
         maven("https://maven.aliyun.com/repository/apache-snapshots/")
-        maven("https://papermc.io/repo/repository/maven-public/")
+        maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://libraries.minecraft.net/")
         mavenCentral()
     }
