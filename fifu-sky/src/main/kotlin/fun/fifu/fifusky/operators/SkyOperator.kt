@@ -24,6 +24,7 @@ import `fun`.fifu.utils.ActionbarUtil
 import org.bukkit.*
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
@@ -294,9 +295,29 @@ object SkyOperator {
      */
     fun Player.canGetIsland(): Pair<Boolean, String> {
         val uuid = uniqueId.toString()
-        val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
-        val lgy = MILLISECONDS.toHours(24 * 7)
-        return Pair(time > lgy, DateUtil.formatBetween(lgy - time))
+        val lastGetTime = Jsoner.getPlayerLastGet(uuid)
+        val currentTime = System.currentTimeMillis()
+        val timeSinceLastGet = currentTime - lastGetTime
+
+        // 将 30 天转换为毫秒
+        val thirtyDaysInMillis = TimeUnit.DAYS.toMillis(30)
+
+        // 计算剩余时间（毫秒）
+        val remainingTimeInMillis = thirtyDaysInMillis - timeSinceLastGet
+
+        // 判断是否可以领取岛
+        val canGetIsland = timeSinceLastGet >= thirtyDaysInMillis
+
+        // 格式化剩余时间
+        val remainingTimeFormatted = if (canGetIsland) {
+            "现在可以领取"
+        } else {
+            DateUtil.formatBetween(remainingTimeInMillis)
+        }
+
+//        println("UUID: $uuid, Time since last get: $timeSinceLastGet ms, 30 days in milliseconds: $thirtyDaysInMillis ms, Remaining time: $remainingTimeFormatted")
+
+        return Pair(canGetIsland, remainingTimeFormatted)
     }
 
     /**

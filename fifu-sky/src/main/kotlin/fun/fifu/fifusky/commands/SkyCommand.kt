@@ -383,7 +383,7 @@ class SkyCommand : TabExecutor {
     private fun onGet(player: Player, p3: Array<out String>): Boolean {
         if (p3.size != 1) return false
         if (!player.canGetIsland().first) {
-            player.sendMessage("每周只能领取一次岛，${player.canGetIsland().second}后可再次领取")
+            player.sendMessage("每个月只能领取一次岛，${player.canGetIsland().second}后可再次领取")
             return true
         }
         var island: Island = Sky.getIsland(Pair(0, 0))
