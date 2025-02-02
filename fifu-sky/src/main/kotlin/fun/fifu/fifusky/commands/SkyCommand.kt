@@ -383,10 +383,13 @@ class SkyCommand : TabExecutor {
     private fun onGet(player: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1) return false
         if (!player.canGetIsland().first) {
-            player.sendMessage("每48小时只能领取一次岛，${player.canGetIsland().second}后可再次领取")
+            player.sendMessage("每周只能领取一次岛，${player.canGetIsland().second}后可再次领取")
             return true
         }
-        val island = Sky.getIsland(p3[1])
+        var island: Island = nextIsLand(Pair(0, 0))
+        do {
+            island = nextIsLand(island.SkyLoc)
+        } while (SQLiteer.getIslandData(island).Privilege.Owner.isNotEmpty())
         if (island.isUnclaimed()) {
             island.build()
             island.addOwner(player)

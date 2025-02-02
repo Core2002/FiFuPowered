@@ -295,7 +295,7 @@ object SkyOperator {
     fun Player.canGetIsland(): Pair<Boolean, String> {
         val uuid = uniqueId.toString()
         val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
-        val lgy = MILLISECONDS.toHours(48)
+        val lgy = MILLISECONDS.toHours(24 * 7)
         return Pair(time > lgy, DateUtil.formatBetween(lgy - time))
     }
 
