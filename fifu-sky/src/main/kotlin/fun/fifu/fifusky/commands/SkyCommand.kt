@@ -68,7 +68,7 @@ class SkyCommand : TabExecutor {
 
     private val helpMassage = mapOf(
         "help" to "/s help [命令] 查看帮助",
-        "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次",
+        "get-new-island" to "/s get-new-island 领取一个新的岛屿，一个月只能领一次",
         "info" to "/s info 查询当前岛屿信息，/s info u 使用uuid查看",
         "homes" to "/s homes 查询你有权限的岛屿",
         "go" to "/s go <SkyLoc> 传送到目标岛屿",
@@ -141,7 +141,7 @@ class SkyCommand : TabExecutor {
             val re = when (p3[0]) {
                 "help" -> onHelp(p0, p3)
                 "?" -> onHelp(p0, p3)
-                "get" -> onGet(p0, p3)
+                "get-new-island" -> onGet(p0, p3)
                 "info" -> onInfo(p0, p3)
                 "homes" -> onHomes(p0)
                 "go" -> onGo(p0, p3)
@@ -381,14 +381,14 @@ class SkyCommand : TabExecutor {
     }
 
     private fun onGet(player: Player, p3: Array<out String>): Boolean {
-        if (p3.size == 1) return false
+        if (p3.size != 1) return false
         if (!player.canGetIsland().first) {
             player.sendMessage("每周只能领取一次岛，${player.canGetIsland().second}后可再次领取")
             return true
         }
-        var island: Island = nextIsLand(Pair(0, 0))
+        var island: Island = Sky.getIsland(Pair(0, 0))
         do {
-            island = nextIsLand(island.SkyLoc)
+            island = Sky.getIsland(Sky.nextIsLand(island.SkyLoc))
         } while (SQLiteer.getIslandData(island).Privilege.Owner.isNotEmpty())
         if (island.isUnclaimed()) {
             island.build()
@@ -435,28 +435,19 @@ class SkyCommand : TabExecutor {
         }
     }
 
-    private fun nextIsLand(skyLoc: Pair<Int, Int>): Island {
-        return if (skyLoc.first > -skyLoc.second) {
-            if (skyLoc.first < skyLoc.second) Sky.getIsland(skyLoc.first + 1, skyLoc.second)
-            else Sky.getIsland(skyLoc.first, skyLoc.second - 1)
-        } else {
-            if (skyLoc.first <= skyLoc.second) Sky.getIsland(skyLoc.first, skyLoc.second + 1)
-            else Sky.getIsland(skyLoc.first - 1, skyLoc.second)
-        }
-    }
-
     private fun generateNewIsland(player: Player): Island {
-        var temp: Island = nextIsLand(Pair(0, 0))
+        var temp = Sky.SPAWN.SkyLoc
         do {
-            temp = nextIsLand(temp.SkyLoc)
-        } while (SQLiteer.getIslandData(temp).Privilege.Owner.isNotEmpty())
+            temp = Sky.nextIsLand(temp)
+        } while (SQLiteer.getIslandData(Sky.getIsland(temp)).Privilege.Owner.isNotEmpty())
 
-        val iLD = SQLiteer.getIslandData(temp)
+        val island = Sky.getIsland(temp)
+        val iLD = SQLiteer.getIslandData(island)
         iLD.Privilege.Owner.add(PlayerData(player.uniqueId.toString(), player.name))
         SkyOperator.playerGetOver(player, iLD)
-        temp.build()
+        island.build()
 
-        return temp
+        return island
     }
 
     /**

@@ -57,7 +57,7 @@ object Sky {
      * @param skyLoc 岛坐标元组
      * @return 岛屿对象
      */
-    private fun getIsland(skyLoc: Pair<Int, Int>): Island {
+    fun getIsland(skyLoc: Pair<Int, Int>): Island {
         if (abs(skyLoc.first) > MAX_ISLAND || abs(skyLoc.second) > MAX_ISLAND)
             throw  java.lang.RuntimeException("SkyLoc 不合法！  ->  $skyLoc")
         return Island(skyLoc, getR(skyLoc.first), getRR(skyLoc.first), getR(skyLoc.second), getRR(skyLoc.second))
@@ -96,5 +96,27 @@ object Sky {
      */
     fun isInIsland(xx: Int, zz: Int, island: Island) =
         xx in island.X..island.XX && zz in island.Y..island.YY
+
+    /**
+     * 根据当前岛屿位置计算下一个岛屿的位置
+     * 该函数通过比较当前位置的横纵坐标来决定下一个岛屿的位置，旨在模拟在天空中移动以寻找岛屿的过程
+     *
+     * @param skyLoc 当前天空中的位置，使用Pair表示，first为横坐标，second为纵坐标
+     * @return 下一个岛屿的位置，同样使用Pair表示
+     */
+    fun nextIsLand(skyLoc: Pair<Int, Int>): Pair<Int, Int> {
+        // 当横坐标大于负的纵坐标时，表示当前位置在模拟的“天空”区域的上半部分
+        return if (skyLoc.first > -skyLoc.second) {
+            // 如果横坐标小于纵坐标，向右移动；否则向下移动
+            // 这里反映了在“天空”区域上半部分移动的逻辑
+            if (skyLoc.first < skyLoc.second) Pair(skyLoc.first + 1, skyLoc.second)
+            else Pair(skyLoc.first, skyLoc.second - 1)
+        } else {
+            // 当横坐标不大于纵坐标时，向上移动；否则向左移动
+            // 这里反映了在“天空”区域下半部分移动的逻辑
+            if (skyLoc.first <= skyLoc.second) Pair(skyLoc.first, skyLoc.second + 1)
+            else Pair(skyLoc.first - 1, skyLoc.second)
+        }
+    }
 
 }

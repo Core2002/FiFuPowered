@@ -35,6 +35,23 @@ class FiFuSkyTest {
                 if (island != island1)
                     throw RuntimeException("坐标转换模块异常！")
             }
+            val area = (island.XX - island.X) * (island.YY - island.Y)
+            if (area != 1023 * 1023)
+                println("岛屿${island.SkyLoc} 面积不一致: $area")
+        }
+    }
+
+    @Test
+    fun foreachAllIsland() {
+        val center = Pair(0, 0)
+        var skyLoc = Sky.nextIsLand(center)
+        for (i in 0..Sky.MAX_ISLAND * Sky.MAX_ISLAND) {
+            skyLoc = Sky.nextIsLand(skyLoc)
+
+            val island = Sky.getIsland(skyLoc)
+            val area = (island.XX - island.X) * (island.YY - island.Y)
+            if (area != 1023 * 1023)
+                println("岛屿${island.SkyLoc} 面积不一致: $area")
         }
     }
 }
