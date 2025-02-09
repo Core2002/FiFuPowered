@@ -1,8 +1,8 @@
 val kotlin_version: String by project
 val hutool_version: String by project
 
-apply{
-    plugin("org.jetbrains.kotlin.jvm")
+plugins{
+    kotlin("jvm") version "2.0.21"
 }
 
 dependencies{

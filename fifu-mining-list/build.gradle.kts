@@ -1,5 +1,5 @@
-apply{
-    plugin("org.jetbrains.kotlin.jvm")
+plugins{
+    kotlin("jvm") version "2.0.21"
 }
 
 tasks.withType<Jar>{

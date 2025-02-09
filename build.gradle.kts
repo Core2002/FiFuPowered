@@ -9,15 +9,9 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-subprojects {
-    apply {
-        plugin("java")
-        plugin("com.github.johnrengelman.shadow")
-    }
-
+allprojects {
     group = "fun.fifu.powered"
     version = "1.21.4-SNAPSHOT"
-    val api_version = "1.21"
 
     repositories {
         mavenLocal()
@@ -28,20 +22,28 @@ subprojects {
         maven("https://libraries.minecraft.net/")
         mavenCentral()
     }
+}
+
+subprojects {
+    apply {
+        plugin("java")
+        plugin("com.github.johnrengelman.shadow")
+    }
+
+    val api_version = "1.21"
 
     dependencies {
-        implementation(fileTree("./lib"))
+        implementation(files("./lib"))
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
         compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
         compileOnly("org.projectlombok:lombok:$lombok_version")
     }
 
-    tasks.withType<ShadowJar> {
-        destinationDirectory = file("$rootDir/build/libs")
-    }
-
     tasks {
+        named<ShadowJar>("shadowJar") {
+            archiveClassifier.set("")
+        }
         register<Copy>("copyBinaryResources") {
             from("src/main/resources") {
                 include("*.db")
@@ -56,8 +58,16 @@ subprojects {
                 "api_version" to api_version
             )
         }
+        register<Copy>("moveJarToOutputDir") {
+            dependsOn("jar")
+            val outputDir = file("$rootDir/build/libs")
+            val shadowJarTask = project.tasks.findByPath("shadowJar") as ShadowJar
+            from(shadowJarTask.outputs.files)
+            into(outputDir)
+        }
         build {
             dependsOn(shadowJar)
+            dependsOn("moveJarToOutputDir")
         }
         test {
             useJUnitPlatform()
