@@ -27,7 +27,10 @@ import okhttp3.Response
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
-import java.io.*
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.IOException
+import java.io.RandomAccessFile
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.security.MessageDigest
@@ -50,6 +53,8 @@ object BackupManager {
     val keysFileName = "ServerBackupKeys"
     var configPojo: ConfigPojo
     val dataPatten = "yyyy-MM-dd"
+    val secureRandom = SecureRandom()
+    val client = OkHttpClient()
 
     init {
         ConfigCenter.makeDefaultConfig(configFileName, ConfigPojo())
@@ -86,8 +91,8 @@ object BackupManager {
         if (fileSize > 128 * 1024 * 1024) {
             splitAndUploadFile(backupName, remoteServerUrl, ::encryptFile, ::makeCord, ::uploadFile)
         } else {
-            val key = ByteArray(32) { SecureRandom().nextInt().toByte() }
-            val iv = ByteArray(16) { SecureRandom().nextInt().toByte() }
+            val key = ByteArray(32) { secureRandom.nextInt().toByte() }
+            val iv = ByteArray(16) { secureRandom.nextInt().toByte() }
             val encryptedBackupName = "$backupName.enc"
             encryptFile(backupName, encryptedBackupName, key, iv)
             uploadFile(encryptedBackupName, remoteServerUrl)
@@ -229,8 +234,6 @@ object BackupManager {
      * @throws IOException If the network request fails.
      */
     fun uploadFile(filePath: String, url: String, retry: Int = 3) {
-        val client = OkHttpClient()
-
         val file = File(filePath)
         val fileBody = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
 
@@ -308,8 +311,8 @@ object BackupManager {
                     fileChannel.transferTo(startOffset, currentChunkSize, outputStream.channel)
                 }
 
-                val key = ByteArray(32) { SecureRandom().nextInt().toByte() }
-                val iv = ByteArray(16) { SecureRandom().nextInt().toByte() }
+                val key = ByteArray(32) { secureRandom.nextInt().toByte() }
+                val iv = ByteArray(16) { secureRandom.nextInt().toByte() }
                 val encryptedBackupName = "$tempFileName.enc"
                 encryptFile(tempFileName, encryptedBackupName, key, iv)
                 File(tempFileName).delete()

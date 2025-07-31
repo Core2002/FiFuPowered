@@ -214,6 +214,8 @@ object DataServer {
         routingContext.response().setStatusCode(200).end(gson.toJson(responseList))
     }
 
+    val datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}")
+
     /**
      * Parses a date from the given filename and returns it as a LocalDate.
      *
@@ -228,8 +230,6 @@ object DataServer {
      */
     fun parseDateFromFilename(filename: String): LocalDate? {
         val dateFormatter = DateTimeFormatter.ofPattern(dataPatten)
-
-        val datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}")
         val matcher = datePattern.matcher(filename)
 
         if (matcher.find()) {
