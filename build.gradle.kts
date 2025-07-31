@@ -5,7 +5,7 @@ val junit_version: String by project
 val lombok_version: String by project
 
 plugins {
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
