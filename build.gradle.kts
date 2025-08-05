@@ -6,7 +6,7 @@ val lombok_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.21"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "9.0.0-rc3"
 }
 
 allprojects {
@@ -27,13 +27,16 @@ allprojects {
 subprojects {
     apply {
         plugin("java")
-        plugin("com.github.johnrengelman.shadow")
+        plugin("com.gradleup.shadow")
     }
 
     val api_version = "1.21"
 
     dependencies {
-        implementation(files("./lib"))
+//        implementation(files("./lib"))
+        implementation(fileTree("lib") {
+            include("*.jar")
+        })
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
         compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
