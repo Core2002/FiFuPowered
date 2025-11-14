@@ -20,23 +20,58 @@ import org.bukkit.scheduler.BukkitTask
 
 class ServerBackup : JavaPlugin() {
     lateinit var loopCheckTask: BukkitTask
+    private lateinit var commandManager: CommandManager
 
-    /**
-     * 插件启用时执行的函数。
-     * 此函数初始化一个定时任务，用于每小时检查是否需要进行备份。
-     * 它利用Bukkit的调度系统，在游戏服务器中安排了一个任务，该任务每小时执行一次，检查当前时间是否适合进行备份操作。
-     */
     override fun onEnable() {
-        loopCheckTask = object : BukkitRunnable() {
-            /**
-             * 定时任务的执行逻辑。
-             * 每次执行时，都会调用[checkCanBackup]检查是否可以进行备份，并通过日志告知当前是否需要进行备份。
-             */
-            override fun run() {
-                checkCanBackup.run()
-                logger.info("正在检查备份，现在${if (isTimeToDoBackup) "需要" else "不需要"}备份")
-            }
-        }.runTaskLater(this, 20 * 60 * 60)
+        // 初始化命令管理器
+        commandManager = CommandManager()
+        
+        // 注册命令
+        getCommand("backup")?.setExecutor(commandManager)
+        getCommand("backup")?.setTabCompleter(commandManager)
+        getCommand("fifu")?.setExecutor(commandManager)
+        getCommand("fifu")?.setTabCompleter(commandManager)
 
+        // 加载配置
+        try {
+            ConfigCenter.makeDefaultConfig("ServerBackupConfig", BackupManager.configPojo)
+            logger.info("配置加载完成")
+        } catch (e: Exception) {
+            logger.severe("配置加载失败: ${e.message}")
+        }
+
+        // 启动定时任务
+        val interval = BackupManager.configPojo.backupCheckIntervalHours * 20L * 60L * 60L
+        loopCheckTask = object : BukkitRunnable() {
+            override fun run() {
+                try {
+                    checkCanBackup.run()
+                    logger.info("正在检查备份，现在${if (isTimeToDoBackup) "需要" else "不需要"}备份")
+                } catch (e: Exception) {
+                    logger.severe("备份检查过程中发生错误: ${e.message}")
+                    e.printStackTrace()
+                }
+            }
+        }.runTaskTimer(this, interval, interval)
+
+        logger.info("FiFuServerBackup插件已启用")
+    }
+
+    override fun onDisable() {
+        // 插件禁用时取消定时任务
+        if (::loopCheckTask.isInitialized) {
+            loopCheckTask.cancel()
+            logger.info("备份检查任务已取消")
+        }
+        
+        // 保存配置
+        try {
+            ConfigCenter.saveAll()
+            logger.info("配置已保存")
+        } catch (e: Exception) {
+            logger.severe("配置保存失败: ${e.message}")
+        }
+
+        logger.info("FiFuServerBackup插件已禁用")
     }
 }

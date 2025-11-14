@@ -49,7 +49,24 @@ object ConfigCenter {
     }
 
     fun <T> readSnapshot(fileName: String, clazz: Class<T>): T {
-        return gson.fromJson(gson.toJson(getConfigObject(fileName)), clazz)
+        return try {
+            gson.fromJson(gson.toJson(getConfigObject(fileName)), clazz)
+        } catch (e: Exception) {
+            throw RuntimeException("读取配置快照失败: $fileName", e)
+        }
+    }
+
+    /**
+     * 验证配置文件的有效性
+     */
+    fun validateConfig(fileName: String, validator: (JsonObject) -> Boolean): Boolean {
+        return try {
+            val config = getConfigObject(fileName)
+            validator(config)
+        } catch (e: Exception) {
+            println("配置验证失败: $fileName, 错误: ${e.message}")
+            false
+        }
     }
 
     private fun getConfigFile(fileName: String): File {

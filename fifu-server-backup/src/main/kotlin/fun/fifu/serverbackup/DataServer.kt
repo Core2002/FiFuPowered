@@ -141,22 +141,55 @@ object DataServer {
             return
         }
 
+        // 检查备份目录是否存在
+        val backupDir = File(configPojo.backupServerDirPath)
+        if (!backupDir.exists()) {
+            backupDir.mkdirs()
+        }
+
+        var successCount = 0
+        var failureCount = 0
+        val maxFileSize = 1024L * 1024L * 1024L // 1GB限制
+
         for (fileUpload in fileUploads) {
             val uploadedFileName = fileUpload.uploadedFileName()
             val fileName = fileUpload.fileName()
             val fileSize = fileUpload.size()
 
-            println("Received file: $fileName (size: $fileSize bytes)")
+            println("接收到文件: $fileName (大小: $fileSize bytes)")
 
-            // Move the file to a permanent location if needed
-            vertx.fileSystem().move(uploadedFileName, Paths.get(configPojo.backupServerDirPath, fileName).toString()) {
+            // 文件大小检查
+            if (fileSize > maxFileSize) {
+                println("文件过大，拒绝上传: $fileName")
+                vertx.fileSystem().delete(uploadedFileName)
+                failureCount++
+                continue
+            }
+
+            // 文件名安全检查
+            if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
+                println("文件名包含非法字符，拒绝上传: $fileName")
+                vertx.fileSystem().delete(uploadedFileName)
+                failureCount++
+                continue
+            }
+
+            // 移动文件到永久位置
+            val targetPath = Paths.get(configPojo.backupServerDirPath, fileName).toString()
+            vertx.fileSystem().move(uploadedFileName, targetPath) {
                 if (it.succeeded()) {
-                    routingContext.response().end("File uploaded successfully")
+                    println("文件上传成功: $fileName")
+                    successCount++
                 } else {
-                    routingContext.response().setStatusCode(200).end("Ok, but failed to move uploaded file")
+                    println("文件移动失败: $fileName, 错误: ${it.cause()?.message}")
+                    vertx.fileSystem().delete(uploadedFileName)
+                    failureCount++
                 }
             }
         }
+
+        val responseMessage = "上传完成 - 成功: $successCount, 失败: $failureCount"
+        routingContext.response().setStatusCode(if (failureCount == 0) 200 else 207).end(responseMessage)
     }
 
     /**
@@ -168,24 +201,43 @@ object DataServer {
      * @param routingContext The Vert.x routing context containing the request and response objects, among others.
      */
     private fun validateCode(routingContext: RoutingContext) {
-        // Check if the user has the required permissions to access this resource.
+        // 检查授权头是否存在
         val codeForClient = routingContext.request().getHeader("Authorization")
+        if (codeForClient == null || codeForClient.isBlank()) {
+            println("缺少授权头，来自IP: ${routingContext.request().remoteAddress().host()}")
+            handleFileDeletion(routingContext)
+            routingContext.response().setStatusCode(401).end("Missing authorization header")
+            return
+        }
+
+        // 检查密钥是否已配置
+        if (configPojo.sendRemoteServerSecret.isBlank()) {
+            println("服务器未配置TOTP密钥")
+            handleFileDeletion(routingContext)
+            routingContext.response().setStatusCode(500).end("Server not configured")
+            return
+        }
+
         try {
             if (!verifier.isValidCode(configPojo.sendRemoteServerSecret, codeForClient)) {
+                println("授权验证失败，来自IP: ${routingContext.request().remoteAddress().host()}")
                 handleFileDeletion(routingContext)
                 routingContext.response().setStatusCode(401).end("Unauthorized")
                 return
             }
         } catch (e: Exception) {
+            println("授权验证异常: ${e.message}, 来自IP: ${routingContext.request().remoteAddress().host()}")
             handleFileDeletion(routingContext)
-            routingContext.response().setStatusCode(402).end("Invalid token")
+            routingContext.response().setStatusCode(401).end("Invalid token")
             return
         }
 
-        // If the code is valid, proceed to the next handler in the chain.
-        println("Authorization code is valid.")
+        // 授权验证通过
+        println("授权验证成功，来自IP: ${routingContext.request().remoteAddress().host()}")
         routingContext.next()
     }
+
+
 
     /**
      * Get the HASH table of files in the upload directory
@@ -217,24 +269,32 @@ object DataServer {
     val datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}")
 
     /**
-     * Parses a date from the given filename and returns it as a LocalDate.
+     * 从文件名中解析日期
+     * 支持格式: backup_YYYY-MM-DD.zip 或类似格式
      *
-     * This method attempts to extract a date string from the provided filename using a regular expression.
-     * If a valid date pattern is found, it parses the date string into a `LocalDate` object using the specified date format.
-     * If no valid date pattern is found or parsing fails, it returns null.
-     *
-     * @param filename The name of the file from which to extract the date.
-     * @return A `LocalDate` object representing the parsed date, or `null` if no valid date is found.
-     *
-     * @see dataPatten The date pattern used for parsing.
+     * @param filename 文件名
+     * @return 解析出的日期，如果无法解析则返回null
      */
     fun parseDateFromFilename(filename: String): LocalDate? {
-        val dateFormatter = DateTimeFormatter.ofPattern(dataPatten)
-        val matcher = datePattern.matcher(filename)
-
-        if (matcher.find()) {
-            val dateString = matcher.group()
-            return LocalDate.parse(dateString, dateFormatter)
+        try {
+            // 使用正则表达式匹配日期格式
+            val pattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})")
+            val matcher = pattern.matcher(filename)
+            
+            if (matcher.find()) {
+                val year = matcher.group(1).toInt()
+                val month = matcher.group(2).toInt()
+                val day = matcher.group(3).toInt()
+                
+                // 验证日期的有效性
+                return try {
+                    LocalDate.of(year, month, day)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            // 忽略解析错误
         }
         return null
     }
@@ -251,18 +311,49 @@ object DataServer {
      * @see ConfigPojo.backupKeepDay The number of days files should be retained before deletion.
      */
     private fun scanExpiredFilesAndDeleted() {
-        val files = File(configPojo.backupServerDirPath).listFiles()
-        val currentDate = LocalDate.now()
-        for (file in files!!) {
-            if (file.isFile) {
-                val fileDate = parseDateFromFilename(file.name)
-                val daysBetween = ChronoUnit.DAYS.between(fileDate, currentDate)
-                if (daysBetween >= configPojo.backupKeepDay) {
-                    file.delete()
-                    println("Parsed Date: $fileDate, Deleted.")
+        try {
+            val backupDir = File(configPojo.backupServerDirPath)
+            if (!backupDir.exists() || !backupDir.isDirectory) {
+                println("备份目录不存在或不是目录: ${configPojo.backupServerDirPath}")
+                return
+            }
+
+            val files = backupDir.listFiles()
+            if (files == null) {
+                println("无法读取备份目录文件列表")
+                return
+            }
+
+            val currentDate = LocalDate.now()
+            var deletedCount = 0
+            var errorCount = 0
+
+            for (file in files) {
+                if (file.isFile) {
+                    try {
+                        val fileDate = parseDateFromFilename(file.name)
+                        if (fileDate != null) {
+                            val daysBetween = ChronoUnit.DAYS.between(fileDate, currentDate)
+                            if (daysBetween >= configPojo.backupKeepDay) {
+                                if (file.delete()) {
+                                    deletedCount++
+                                    println("已删除过期文件: ${file.name} (日期: $fileDate)")
+                                } else {
+                                    errorCount++
+                                    println("删除文件失败: ${file.name}")
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        errorCount++
+                        println("处理文件时出错: ${file.name}, 错误: ${e.message}")
+                    }
                 }
             }
+            
+            println("过期文件扫描完成 - 删除: $deletedCount, 错误: $errorCount")
+        } catch (e: Exception) {
+            println("扫描过期文件时发生错误: ${e.message}")
         }
-        println("Scan expired files, Done.")
     }
 }

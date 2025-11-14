@@ -3,3 +3,23 @@ name: FiFuServerBackup
 version: ${version}
 api-version: ${api_version}
 author: NekokeCore
+description: Minecraft服务器备份插件，支持自动备份、加密传输、远程同步
+website: https://github.com/FiFuProject/FiFuPowered
+
+commands:
+  backup:
+    description: 备份相关命令
+    usage: /backup [start|status|config|reload]
+    permission: fifu.backup.use
+  fifu:
+    description: FiFu插件主命令
+    usage: /fifu [version|info]
+    permission: fifu.admin
+
+permissions:
+  fifu.backup.use:
+    description: 使用备份命令的权限
+    default: op
+  fifu.admin:
+    description: 管理员权限
+    default: op

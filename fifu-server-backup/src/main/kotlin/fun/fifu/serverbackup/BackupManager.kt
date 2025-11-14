@@ -38,6 +38,8 @@ import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.concurrent.thread
@@ -199,10 +201,14 @@ object BackupManager {
 
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
 
-        val inputBytes = Files.readAllBytes(Paths.get(inputPath))
-        val encryptedBytes = cipher.doFinal(inputBytes)
-
-        Files.write(Paths.get(outputPath), encryptedBytes)
+        // 使用流式处理避免大文件内存溢出
+        File(inputPath).inputStream().use { inputStream ->
+            File(outputPath).outputStream().use { outputStream ->
+                val cipherOutputStream = CipherOutputStream(outputStream, cipher)
+                inputStream.copyTo(cipherOutputStream)
+                cipherOutputStream.close()
+            }
+        }
     }
 
     /**
@@ -220,10 +226,13 @@ object BackupManager {
 
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
 
-        val inputBytes = Files.readAllBytes(Paths.get(inputPath))
-        val decryptedBytes = cipher.doFinal(inputBytes)
-
-        Files.write(Paths.get(outputPath), decryptedBytes)
+        // 使用流式处理避免大文件内存溢出
+        File(inputPath).inputStream().use { inputStream ->
+            val cipherInputStream = CipherInputStream(inputStream, cipher)
+            File(outputPath).outputStream().use { outputStream ->
+                cipherInputStream.copyTo(outputStream)
+            }
+        }
     }
 
     /**
@@ -235,6 +244,18 @@ object BackupManager {
      */
     fun uploadFile(filePath: String, url: String, retry: Int = 3) {
         val file = File(filePath)
+        
+        // 文件存在性检查
+        if (!file.exists()) {
+            throw IOException("文件不存在: $filePath")
+        }
+        
+        // 文件大小检查 (限制为1GB)
+        val maxSizeBytes = 1024L * 1024L * 1024L
+        if (file.length() > maxSizeBytes) {
+            throw IOException("文件过大: ${file.length()} bytes, 最大允许: $maxSizeBytes bytes")
+        }
+
         val fileBody = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
 
         val multipartBody = MultipartBody.Builder()
@@ -246,19 +267,36 @@ object BackupManager {
             .url(url)
             .post(multipartBody)
             .addHeader("Authorization", getTOTPCode())
+            .addHeader("User-Agent", "FiFuServerBackup/1.0")
             .build()
 
         client.newCall(request).execute().use { response: Response ->
-            if (!response.isSuccessful || !verifyHash(calculateSha512(filePath))) {
+            val responseBody = response.body?.string() ?: ""
+            if (!response.isSuccessful) {
                 if (retry > 0) {
-                    println("文件${filePath}上传失败，正在重试，剩余重试次数：${retry - 1}")
+                    println("文件${filePath}上传失败，HTTP状态码: ${response.code}, 正在重试，剩余重试次数：${retry - 1}")
+                    Thread.sleep(2000) // 重试前等待2秒
                     uploadFile(filePath, url, retry - 1)
                     return
                 } else {
-                    throw IOException("Unexpected code $response")
+                    throw IOException("上传失败，HTTP状态码: ${response.code}, 响应: $responseBody")
                 }
             }
-            println("ok! ${response.body?.string()}")
+            
+            // 验证哈希值
+            val fileHash = calculateSha512(filePath)
+            if (!verifyHash(fileHash)) {
+                if (retry > 0) {
+                    println("文件${filePath}哈希验证失败，正在重试，剩余重试次数：${retry - 1}")
+                    Thread.sleep(2000)
+                    uploadFile(filePath, url, retry - 1)
+                    return
+                } else {
+                    throw IOException("哈希验证失败，文件可能已损坏")
+                }
+            }
+            
+            println("文件上传成功: $filePath, 响应: $responseBody")
         }
     }
 
@@ -339,11 +377,20 @@ object BackupManager {
             val secret = secretGenerator.generate()
             configPojo.sendRemoteServerSecret = secret
             ConfigCenter.setValue(configFileName, "sendRemoteServerSecret", ConfigCenter.convertToJsonPrimitive(secret))
+            println("已生成新的TOTP密钥，请确保客户端同步更新")
         }
-        val codeGenerator = DefaultCodeGenerator(HashingAlgorithm.SHA512)
+        val codeGenerator = DefaultCodeGenerator(HashingAlgorithm.SHA512, 6) // 6位数字
         val timeProvider = SystemTimeProvider()
 
-        return codeGenerator.generate(configPojo.sendRemoteServerSecret, timeProvider.time.floorDiv(30))
+        // 使用30秒时间窗口，但增加时间容差
+        val currentTime = timeProvider.time
+        val timeSlot = currentTime.floorDiv(30)
+        
+        return try {
+            codeGenerator.generate(configPojo.sendRemoteServerSecret, timeSlot)
+        } catch (e: Exception) {
+            throw RuntimeException("TOTP代码生成失败", e)
+        }
     }
 
     /**
@@ -354,13 +401,24 @@ object BackupManager {
      * @throws RuntimeException If the SHA-512 hash value of the file cannot be calculated.
      */
     fun calculateSha512(filePath: String): String {
+        val file = File(filePath)
+        if (!file.exists()) {
+            throw RuntimeException("文件不存在: $filePath")
+        }
+        
         return try {
-            val bytes = Files.readAllBytes(Paths.get(filePath))
             val md: MessageDigest = MessageDigest.getInstance("SHA-512")
-            val messageDigest = md.digest(bytes)
+            file.inputStream().use { inputStream ->
+                val buffer = ByteArray(8192)
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    md.update(buffer, 0, bytesRead)
+                }
+            }
+            val messageDigest = md.digest()
             messageDigest.joinToString("") { "%02x".format(it) }
         } catch (e: Exception) {
-            throw RuntimeException("Failed to calculate SHA-512 for $filePath", e)
+            throw RuntimeException("计算SHA-512失败: $filePath", e)
         }
     }
 

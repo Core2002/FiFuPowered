@@ -24,7 +24,7 @@ data class ConfigPojo(
     /**
      * 备份文件存储目录的路径。默认为当前目录。
      */
-    var backupServerDirPath: String = "./",
+    var backupServerDirPath: String = "./backups",
 
     /**
      * 备份文件在本地保留的最长时间（天数）。默认为7天。
@@ -37,12 +37,22 @@ data class ConfigPojo(
     var sendToRemoteServer: Boolean = false,
 
     /**
-     * 远程服务器的URL地址。默认为空字符串。
+     * 远程服务器的URL地址。默认为空字符串，需要用户手动配置。
      */
-    var sendRemoteServerUrl: String = "http://localhost:6542/upload",
+    var sendRemoteServerUrl: String = "",
 
     /**
-     * 令牌，用于验证身份。默认为空字符串。
+     * TOTP密钥，用于验证身份。默认为空字符串，首次使用时自动生成。
      */
-    var sendRemoteServerSecret: String = ""
+    var sendRemoteServerSecret: String = "",
+
+    /**
+     * 最大文件上传大小（MB）。默认为1024MB（1GB）。
+     */
+    var maxUploadSizeMB: Int = 1024,
+
+    /**
+     * 备份检查间隔（小时）。默认为1小时。
+     */
+    var backupCheckIntervalHours: Int = 1
 )
