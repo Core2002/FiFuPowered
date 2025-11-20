@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter
 
 class BookCommand : TabExecutor {
     private val bookFiles = mutableListOf<String>()
-    private val myDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日HH时")
+    private val myDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy 年 MM 月 dd 日 HH 时")
 
     private val helpMassage = mapOf(
         "help" to "/book help [command] 来查看帮助",
@@ -41,7 +41,7 @@ class BookCommand : TabExecutor {
     )
 
     /**
-     * Tab完成函数，用于根据玩家输入提供命令建议。
+     * Tab 完成函数，用于根据玩家输入提供命令建议。
      *
      * @param p0 命令发送者，可以是玩家或服务器本身。
      * @param p1 命令对象。
@@ -137,11 +137,11 @@ class BookCommand : TabExecutor {
      *
      * @param p0 当前操作的玩家对象。
      * @param p3 一个字符串数组，包含操作指令的后续参数。第一个参数无用，第二个参数是书名，
-     *           如果有第三个参数，则表示目标玩家的名称，用于OP玩家给其他玩家看书。
-     * @return 总是返回true，表示操作已经被处理。
+     *           如果有第三个参数，则表示目标玩家的名称，用于 OP 玩家给其他玩家看书。
+     * @return 总是返回 true，表示操作已经被处理。
      *
-     * 此函数首先检查参数数量，如果不满足条件则直接返回false或true。
-     * 然后根据参数判断是否需要打开书籍，如果是OP玩家，还可以指定其他玩家打开书籍。
+     * 此函数首先检查参数数量，如果不满足条件则直接返回 false 或 true。
+     * 然后根据参数判断是否需要打开书籍，如果是 OP 玩家，还可以指定其他玩家打开书籍。
      */
     private fun viewBook(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1)
@@ -158,7 +158,7 @@ class BookCommand : TabExecutor {
                 player?.openBook(importBook("plugins/$pluginName/${p3[1].filt()}.txt", Material.WRITTEN_BOOK))
                 player?.sendMessage("正在浏览书 ${p3[1].filt()}")
             } else {
-                p0.sendMessage("只有OP才有这个权限")
+                p0.sendMessage("只有 OP 才有这个权限")
             }
         }
         return true
@@ -169,13 +169,13 @@ class BookCommand : TabExecutor {
      *
      * @param p0 玩家对象，书籍将被导入到这个玩家的库存中。
      * @param p3 包含导入命令参数的字符串数组，其中第二个元素是书籍的文件名。
-     * @return 如果成功导入书籍，则返回true；如果文件名不正确或书籍已存在，则返回false。
+     * @return 如果成功导入书籍，则返回 true；如果文件名不正确或书籍已存在，则返回 false。
      *
-     * 此函数首先检查数组p3的长度是否为1，如果是，则表示没有提供正确的文件名，因此直接返回false。
-     * 接着，它检查书籍文件名是否存在于bookFiles中，如果不存在，表示该书籍不需要导入，直接返回true。
+     * 此函数首先检查数组 p3 的长度是否为 1，如果是，则表示没有提供正确的文件名，因此直接返回 false。
+     * 接着，它检查书籍文件名是否存在于 bookFiles 中，如果不存在，表示该书籍不需要导入，直接返回 true。
      * 如果文件名存在，那么它会尝试导入书籍。书籍文件路径是基于插件名称和提供的文件名构建的。
      * 成功导入书籍后，它会将书籍添加到玩家的库存中，并通过发送消息通知玩家导入成功。
-     * 最后，函数返回true，表示书籍成功导入。
+     * 最后，函数返回 true，表示书籍成功导入。
      */
     private fun importBookFromFile(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1)
@@ -191,11 +191,11 @@ class BookCommand : TabExecutor {
      * 将玩家主手持有的书本导出到文件。
      *
      * 此函数检查玩家主手是否持有书本（或书与笔），如果是，则将该书本的内容导出到一个文本文件中。
-     * 导出的文件名基于玩家名称、当前时间以及书本的标题生成，存储在plugins目录下。
+     * 导出的文件名基于玩家名称、当前时间以及书本的标题生成，存储在 plugins 目录下。
      *
      * @param p0 当前玩家对象，必须持有书本才能导出。
-     * @param p3 一个字符串数组，其中p3[1]被用作导出文件名的一部分。
-     * @return 总是返回true，表示导出操作已启动（尽管实际成功与否取决于后续逻辑）。
+     * @param p3 一个字符串数组，其中 p3[1] 被用作导出文件名的一部分。
+     * @return 总是返回 true，表示导出操作已启动（尽管实际成功与否取决于后续逻辑）。
      */
     private fun exportBookToFile(p0: Player, p3: Array<out String>): Boolean {
         val bookMeta = p0.inventory.itemInMainHand.itemMeta ?: {
@@ -218,7 +218,7 @@ class BookCommand : TabExecutor {
      * 将玩家主手中的书复制到玩家的背包中。
      *
      * @param p0 需要复制书的玩家。
-     * @return 总是返回true，表示函数执行成功。
+     * @return 总是返回 true，表示函数执行成功。
      *
      * 函数首先检查玩家主手中的物品是否是书（BookMeta）类型，
      * 如果不是，则向玩家发送错误消息要求他们持有书。
@@ -242,8 +242,8 @@ class BookCommand : TabExecutor {
      * 当玩家输入特定的帮助命令时，此函数被调用，用于提供有关命令的详细信息或显示所有可用命令的列表。
      *
      * @param player 请求帮助的玩家对象。
-     * @param p3 帮助命令的参数数组，其中p3[1]用于指定特定的命令获取详细帮助。
-     * @return 总是返回true，表示帮助信息已成功发送给玩家。
+     * @param p3 帮助命令的参数数组，其中 p3[1] 用于指定特定的命令获取详细帮助。
+     * @return 总是返回 true，表示帮助信息已成功发送给玩家。
      */
     private fun onHelp(player: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1) {
@@ -260,7 +260,7 @@ class BookCommand : TabExecutor {
     /**
      * 过滤字符串中的特定字符。
      *
-     * 该函数旨在从字符串中移除一些特殊字符，包括点号(.)、冒号(:)、斜杠(/)和反斜杠(\)。
+     * 该函数旨在从字符串中移除一些特殊字符，包括点号 (.)、冒号 (:)、斜杠 (/) 和反斜杠 (\)。
      * 这对于处理需要去除这些字符的字符串场景非常有用，比如文件路径处理或简单的字符串清洁。
      *
      * @return 返回一个新的字符串，其中不包含点号、冒号、斜杠和反斜杠。

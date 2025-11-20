@@ -24,9 +24,9 @@ import java.io.File
 object BookOperator {
 
     /**
-     * 复制一本书的元数据，并返回一个新的ItemStack。
+     * 复制一本书的元数据，并返回一个新的 ItemStack。
      *
-     * @return 一个具有相同页面的可写书的ItemStack。
+     * @return 一个具有相同页面的可写书的 ItemStack。
      */
     fun BookMeta.copyBook(): ItemStack {
         val bookMeta = Bukkit.getItemFactory().getItemMeta(Material.WRITABLE_BOOK) as BookMeta
@@ -48,16 +48,16 @@ object BookOperator {
      *
      * @param path 文件的路径。
      * @param type 导入后书的材质，默认为可写书。
-     * @return 一个具有导入页面的书的ItemStack。
+     * @return 一个具有导入页面的书的 ItemStack。
      */
     fun importBook(path: String, type: Material = Material.WRITABLE_BOOK) = makeBook(File(path).readText(), type)
 
     /**
      * 根据提供的文本和材质类型创建一本书籍物品。
      *
-     * @param text 书籍的页面内容，以JSON格式的字符串表示。
+     * @param text 书籍的页面内容，以 JSON 格式的字符串表示。
      * @param type 书籍的材质类型，默认为可书写的书籍。
-     * @return 创建的书籍物品Stack。
+     * @return 创建的书籍物品 Stack。
      */
     fun makeBook(text: String, type: Material = Material.WRITABLE_BOOK): ItemStack {
         val list = JSONParser().parse(text) as List<String>

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 import cn.hutool.json.JSONUtil
 
 /**
- * Json造作者单例，负责操作Json数据
+ * Json 造作者单例，负责操作 Json 数据
  * @author NekokeCore
  */
 object Jsoner {
@@ -46,8 +46,8 @@ object Jsoner {
     }
 
     /**
-     * 判断玩家是否是FiFuAdmin
-     * @param uuid 玩家的uuid
+     * 判断玩家是否是 FiFuAdmin
+     * @param uuid 玩家的 uuid
      * @return true：是    false：不是
      */
     fun judUUIDisFiFuAdmin(uuid: String): Boolean {
@@ -56,8 +56,8 @@ object Jsoner {
     }
 
     /**
-     * 设置玩家为玩家FiFuAdmin
-     * @param uuid 玩家的uuid
+     * 设置玩家为玩家 FiFuAdmin
+     * @param uuid 玩家的 uuid
      */
     fun addFiFuAdminUUID(uuid: String) {
         val arr = JSONUtil.parseArray(String(cache["FiFuAdminList"] ?: "[]".toByteArray()))
@@ -69,7 +69,7 @@ object Jsoner {
 
     /**
      * 获取玩家上次领取岛的时间
-     * @param uuid 玩家的uuid
+     * @param uuid 玩家的 uuid
      * @return 该玩家上次获取岛屿的时间的时间戳
      */
     fun getPlayerLastGet(uuid: String): Long {
@@ -79,7 +79,7 @@ object Jsoner {
 
     /**
      * 设置玩家上次领取岛的时间的时间戳
-     * @param uuid 玩家的uuid
+     * @param uuid 玩家的 uuid
      * @param time 时间戳
      */
     fun setPlayerLastGet(uuid: String, time: Long) {

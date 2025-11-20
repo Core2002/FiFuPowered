@@ -35,7 +35,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 class Innovate : Listener {
 
     /**
-     * 当玩家交换副手时触发本事件.
+     * 当玩家交换副手时触发本事件。
      */
     @EventHandler
     fun onSwapHand(event: PlayerSwapHandItemsEvent) {

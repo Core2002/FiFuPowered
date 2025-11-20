@@ -77,8 +77,8 @@ object PackageUtil {
     }
 
     /**
-     * 从jar获取某包下所有类
-     * @param jarPath jar文件路径，示例：D://CraftKotlin.jar!.
+     * 从 jar 获取某包下所有类
+     * @param jarPath jar 文件路径，示例：D://CraftKotlin.jar!.
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
@@ -121,8 +121,8 @@ object PackageUtil {
     }
 
     /**
-     * 从所有jar中搜索该包，并获取该包下所有类
-     * @param urls URL集合
+     * 从所有 jar 中搜索该包，并获取该包下所有类
+     * @param urls URL 集合
      * @param packagePath 包路径
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
@@ -133,7 +133,7 @@ object PackageUtil {
             for (i in urls.indices) {
                 val url = urls[i]
                 val urlPath = url.path
-                // 不必搜索classes文件夹
+                // 不必搜索 classes 文件夹
                 if (urlPath.endsWith("classes/")) {
                     continue
                 }

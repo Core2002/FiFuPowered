@@ -56,7 +56,7 @@ object SQLiteer {
 
     /**
      * 把玩家主岛存入数据库
-     * @param playerUUID 玩家UUID
+     * @param playerUUID 玩家 UUID
      * @param playerIsland 玩家主岛
      */
     fun savePlayerIndex(playerUUID: String, playerIsland: String) {
@@ -78,7 +78,7 @@ object SQLiteer {
 
     /**
      * 从数据文件获取玩家的主岛
-     * @param playerUUID 玩家UUID
+     * @param playerUUID 玩家 UUID
      * @return 玩家主岛
      */
     fun getPlayerIndex(playerUUID: String): Island {
@@ -93,9 +93,9 @@ object SQLiteer {
 
 
     /**
-     * 把玩家的ip存入数据库
-     * @param playerUUID 玩家UUID
-     * @param playerIP 玩家IP
+     * 把玩家的 ip 存入数据库
+     * @param playerUUID 玩家 UUID
+     * @param playerIP 玩家 IP
      */
     fun savePlayerIp(playerUUID: String, playerIP: String) {
         if (Db.use().findAll(Entity.create(PlayerData).set("UUID", playerUUID)).isEmpty()) {
@@ -120,9 +120,9 @@ object SQLiteer {
 
 
     /**
-     * 从数据库获取玩家IP列表
-     * @param playerUUID 玩家UUID
-     * @return 玩家IP列表
+     * 从数据库获取玩家 IP 列表
+     * @param playerUUID 玩家 UUID
+     * @return 玩家 IP 列表
      */
     private fun getPlayerIp(playerUUID: String): JSONArray {
         val temp = Db.use().findAll(Entity.create(PlayerData).set("UUID", playerUUID))
@@ -136,9 +136,9 @@ object SQLiteer {
     }
 
     /**
-     * 把存放玩家信息的JSONArray字符串换成玩家信息列表
-     * @param jsArrStr 把存放玩家信息的JSONArray字符串
-     * @return 指定岛屿文件的JSONObject的指定类别的玩家信息列表
+     * 把存放玩家信息的 JSONArray 字符串换成玩家信息列表
+     * @param jsArrStr 把存放玩家信息的 JSONArray 字符串
+     * @return 指定岛屿文件的 JSONObject 的指定类别的玩家信息列表
      */
     private fun getPlayersData(jsArrStr: String): ArrayList<PlayerData> {
         val contentsPlayersData = ArrayList<PlayerData>()
@@ -152,8 +152,8 @@ object SQLiteer {
     }
 
     /**
-     * 根据UUID返回玩家名，若查询不到则返回玩家UUID
-     * @param playerUUID 玩家UUID
+     * 根据 UUID 返回玩家名，若查询不到则返回玩家 UUID
+     * @param playerUUID 玩家 UUID
      * @return 玩家名
      */
     fun getPlayerName(playerUUID: String): String {
@@ -166,9 +166,9 @@ object SQLiteer {
     }
 
     /**
-     * 根据玩家名返回玩家UUID，若查询不到则返回玩家名
+     * 根据玩家名返回玩家 UUID，若查询不到则返回玩家名
      * @param playerName 玩家名
-     * @return 玩家UUID
+     * @return 玩家 UUID
      */
     fun getPlayerUuid(playerName: String): String {
         val temp = Db.use().findAll(Entity.create(PlayerData).set("Name", playerName))
@@ -180,8 +180,8 @@ object SQLiteer {
     }
 
     /**
-     * 存储玩家的UUID-Name数据
-     * @param playerUUID 玩家UUID
+     * 存储玩家的 UUID-Name 数据
+     * @param playerUUID 玩家 UUID
      * @param playerName 玩家名
      */
     fun savePlayerName(playerUUID: String, playerName: String) {
@@ -200,7 +200,7 @@ object SQLiteer {
     }
 
     /**
-     * 把IslandData保存到数据库
+     * 把 IslandData 保存到数据库
      * @param islandData 岛屿数据
      */
     fun saveIslandData(islandData: IslandData) {
@@ -272,7 +272,7 @@ object SQLiteer {
 
     /**
      * 获取玩家的岛屿列表
-     * @param uuid 玩家的UUID
+     * @param uuid 玩家的 UUID
      * @return 第一个：玩家所拥有的岛屿    第二个：玩家所加入的岛屿
      */
     fun getHomes(uuid: String): Pair<ArrayList<IslandData>, ArrayList<IslandData>> {

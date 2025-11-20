@@ -37,7 +37,7 @@ class FiFuSkyTest {
             }
             val area = (island.XX - island.X) * (island.YY - island.Y)
             if (area != 1023 * 1023)
-                println("岛屿${island.SkyLoc} 面积不一致: $area")
+                println("岛屿${island.SkyLoc} 面积不一致：$area")
         }
     }
 
@@ -51,7 +51,7 @@ class FiFuSkyTest {
             val island = Sky.getIsland(skyLoc)
             val area = (island.XX - island.X) * (island.YY - island.Y)
             if (area != 1023 * 1023)
-                println("岛屿${island.SkyLoc} 面积不一致: $area")
+                println("岛屿${island.SkyLoc} 面积不一致：$area")
         }
     }
 }

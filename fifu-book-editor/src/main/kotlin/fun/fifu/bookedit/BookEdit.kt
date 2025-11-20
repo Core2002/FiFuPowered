@@ -26,7 +26,7 @@ class BookEdit : JavaPlugin(), Listener {
     /**
      * 当插件加载时执行的函数。
      * 此函数主要负责初始化文件系统并创建插件目录。
-     * onLoad函数没有参数和返回值。
+     * onLoad 函数没有参数和返回值。
      */
     override fun onLoad() {
         fs = this

@@ -43,7 +43,7 @@ class BackupManagerTest {
         
         // 验证哈希值不为空且长度正确
         assertNotNull(hash)
-        assertEquals(128, hash.length) // SHA-512 产生128位十六进制字符串
+        assertEquals(128, hash.length) // SHA-512 产生 128 位十六进制字符串
         
         // 验证相同文件产生相同哈希
         val hash2 = BackupManager.calculateSha512(testFile.absolutePath)
@@ -60,7 +60,7 @@ class BackupManagerTest {
         val encryptedFile = tempDir.resolve("test.enc").toFile()
         val decryptedFile = tempDir.resolve("test_decrypted.txt").toFile()
 
-        // 生成密钥和IV
+        // 生成密钥和 IV
         val key = ByteArray(32) { it.toByte() }
         val iv = ByteArray(16) { it.toByte() }
 
@@ -132,13 +132,13 @@ class DataServerTest {
         assertEquals(15, date4.dayOfMonth)
 
         // 测试边界情况
-        val date5 = DataServer.parseDateFromFilename("backup_2024-02-29.zip") // 2024年是闰年
+        val date5 = DataServer.parseDateFromFilename("backup_2024-02-29.zip") // 2024 年是闰年
         assertNotNull(date5)
         assertEquals(2024, date5!!.year)
         assertEquals(2, date5.monthValue)
         assertEquals(29, date5.dayOfMonth)
 
-        // 测试非闰年的2月29日
+        // 测试非闰年的 2 月 29 日
         val date6 = DataServer.parseDateFromFilename("backup_2023-02-29.zip")
         assertNull(date6)
     }

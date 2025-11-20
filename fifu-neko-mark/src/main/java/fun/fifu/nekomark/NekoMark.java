@@ -39,7 +39,7 @@ public class NekoMark extends JavaPlugin implements Listener {
      * @param command 被发送的命令对象。
      * @param label   命令的标签，即命令的名称。
      * @param args    命令的参数，用于指定具体的命令动作。
-     * @return 命令处理的结果，true表示命令被成功处理，false表示处理失败或不适用。
+     * @return 命令处理的结果，true 表示命令被成功处理，false 表示处理失败或不适用。
      */
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if ("neko-mark".equalsIgnoreCase(command.getName())) {
@@ -83,7 +83,7 @@ public class NekoMark extends JavaPlugin implements Listener {
                 itemMeta.setLore(lore);
                 mainHandItemStack.setItemMeta(itemMeta);
                 inventory.setItemInMainHand(mainHandItemStack);
-                player.sendMessage("已刻上了" + args[1] + "的印记:" + ownerUUID);
+                player.sendMessage("已刻上了" + args[1] + "的印记：" + ownerUUID);
                 return true;
             }
             return true;
@@ -93,7 +93,7 @@ public class NekoMark extends JavaPlugin implements Listener {
 
     /**
      * 处理玩家使用物品的事件。
-     * 当玩家使用物品时，此事件会被触发。此方法检查玩家所使用的物品是否具有合法的NekoMark标记。
+     * 当玩家使用物品时，此事件会被触发。此方法检查玩家所使用的物品是否具有合法的 NekoMark 标记。
      * 如果物品不合法，玩家将被踢出游戏。
      *
      * @param event 此事件包含有关玩家交互的所有信息，如玩家、使用的物品等。
@@ -116,9 +116,9 @@ public class NekoMark extends JavaPlugin implements Listener {
     }
 
     /**
-     * 为指定的UUID在lore列表中添加标记。
-     * 如果lore中已经存在包含该UUID的字符串，则不进行任何操作。
-     * 如果lore中不存在包含该UUID的字符串，则将新字符串添加到lore列表末尾。
+     * 为指定的 UUID 在 lore 列表中添加标记。
+     * 如果 lore 中已经存在包含该 UUID 的字符串，则不进行任何操作。
+     * 如果 lore 中不存在包含该 UUID 的字符串，则将新字符串添加到 lore 列表末尾。
      *
      * @param lore 一个字符串列表，用于存储标记信息。
      * @param uuid 需要添加标记的唯一标识符。
@@ -128,15 +128,15 @@ public class NekoMark extends JavaPlugin implements Listener {
             if (!l.contains(uuid)) continue;
             return;
         }
-        lore.add("小白印记:" + uuid);
+        lore.add("小白印记：" + uuid);
     }
 
     /**
-     * 检查lore列表中是否包含指定的uuid标记。
+     * 检查 lore 列表中是否包含指定的 uuid 标记。
      *
      * @param lore 一个字符串列表，代表了某种记录或描述。
      * @param uuid 要查找的特定标记，是一个唯一标识符。
-     * @return 如果lore中存在包含"小白印记"且同时包含指定uuid的字符串，则返回true；否则返回false。
+     * @return 如果 lore 中存在包含"小白印记"且同时包含指定 uuid 的字符串，则返回 true；否则返回 false。
      */
     public static boolean hasMark(List<String> lore, String uuid) {
         for (String l : lore) {

@@ -22,7 +22,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 
 /**
- * 模块:欢迎萌新
+ * 模块：欢迎萌新
  * @author NekokeCore
  */
 class Welcome : Listener {
@@ -37,8 +37,8 @@ class Welcome : Listener {
         } catch (e: Exception) {
             event.player.tpIsland(Sky.SPAWN)
             event.player.sendTitle(
-                "§a欢迎萌新owo ${event.player.displayName}",
-                "§a使用/s以开始你的空岛生涯",
+                "§a 欢迎萌新 owo ${event.player.displayName}",
+                "§a 使用/s 以开始你的空岛生涯",
                 10, 20 * 60 * 60 * 24, 20
             )
         }

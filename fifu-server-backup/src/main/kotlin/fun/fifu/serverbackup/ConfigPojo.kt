@@ -17,7 +17,7 @@ package `fun`.fifu.serverbackup
  */
 data class ConfigPojo(
     /**
-     * 是否启用备份功能。默认为false。
+     * 是否启用备份功能。默认为 false。
      */
     var enableBackup: Boolean = false,
 
@@ -27,32 +27,32 @@ data class ConfigPojo(
     var backupServerDirPath: String = "./backups",
 
     /**
-     * 备份文件在本地保留的最长时间（天数）。默认为7天。
+     * 备份文件在本地保留的最长时间（天数）。默认为 7 天。
      */
     var backupKeepDay: Int = 7,
 
     /**
-     * 是否将备份文件发送到远程服务器。默认为false。
+     * 是否将备份文件发送到远程服务器。默认为 false。
      */
     var sendToRemoteServer: Boolean = false,
 
     /**
-     * 远程服务器的URL地址。默认为空字符串，需要用户手动配置。
+     * 远程服务器的 URL 地址。默认为空字符串，需要用户手动配置。
      */
     var sendRemoteServerUrl: String = "",
 
     /**
-     * TOTP密钥，用于验证身份。默认为空字符串，首次使用时自动生成。
+     * TOTP 密钥，用于验证身份。默认为空字符串，首次使用时自动生成。
      */
     var sendRemoteServerSecret: String = "",
 
     /**
-     * 最大文件上传大小（MB）。默认为1024MB（1GB）。
+     * 最大文件上传大小（MB）。默认为 1024MB（1GB）。
      */
     var maxUploadSizeMB: Int = 1024,
 
     /**
-     * 备份检查间隔（小时）。默认为1小时。
+     * 备份检查间隔（小时）。默认为 1 小时。
      */
     var backupCheckIntervalHours: Int = 1
 )

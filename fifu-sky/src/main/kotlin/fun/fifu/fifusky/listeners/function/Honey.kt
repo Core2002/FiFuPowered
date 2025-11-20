@@ -25,7 +25,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.ArrayList
 
 /**
- * 模块:喝蜂蜜起飞
+ * 模块：喝蜂蜜起飞
  * @author NekokeCore
  */
 class Honey : Listener {
@@ -49,7 +49,7 @@ class Honey : Listener {
             honeyPlayer.add(uuid)
             player.allowFlight = true
             player.isFlying = true
-            player.sendActionbarMessage("你现在是一只小蜜蜂，可以短暂飞行了(500tick)")
+            player.sendActionbarMessage("你现在是一只小蜜蜂，可以短暂飞行了 (500tick)")
             object : BukkitRunnable() {
                 override fun run() {
                     object : BukkitRunnable() {
@@ -59,7 +59,7 @@ class Honey : Listener {
                             honeyPlayer.remove(uuid)
                         }
                     }.runTaskLater(FiFuSky.fs, 200)
-                    player.sendActionbarMessage("短暂飞行将在200个tick后结束")
+                    player.sendActionbarMessage("短暂飞行将在 200 个 tick 后结束")
                 }
             }.runTaskLater(FiFuSky.fs, 300)
         }

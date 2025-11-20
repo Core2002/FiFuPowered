@@ -20,12 +20,12 @@ import java.util.*
 import org.bukkit.scheduler.BukkitRunnable
 
 /**
- * Tpa操作者单例，负责处理玩家的tpa请求
+ * Tpa 操作者单例，负责处理玩家的 tpa 请求
  * @author NekokeCore
  */
 object Tpaer {
     /**
-     * 存储所有的tpa请求，方向是从左往右，重启后清空，用完清空，超时清空
+     * 存储所有的 tpa 请求，方向是从左往右，重启后清空，用完清空，超时清空
      */
     var tpaRequest: MutableMap<String, String> = HashMap()
 
@@ -51,8 +51,8 @@ object Tpaer {
             }
         } else {
             tpaRequest[f] = g
-            from.sendMessage("已向玩家 ${goto.name} 发起传送请求，8秒未回应则销毁")
-            goto.sendMessage("玩家 ${from.name} 想传送到你这里来，在8秒内输入/s tpa可同意传送")
+            from.sendMessage("已向玩家 ${goto.name} 发起传送请求，8 秒未回应则销毁")
+            goto.sendMessage("玩家 ${from.name} 想传送到你这里来，在 8 秒内输入/s tpa 可同意传送")
             object : BukkitRunnable() {
                 override fun run() {
                     if (!tpaRequest.remove(f).isNullOrEmpty())

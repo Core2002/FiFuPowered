@@ -3,7 +3,7 @@ name: FiFuServerBackup
 version: ${version}
 api-version: ${api_version}
 author: NekokeCore
-description: Minecraft服务器备份插件，支持自动备份、加密传输、远程同步
+description: Minecraft 服务器备份插件，支持自动备份、加密传输、远程同步
 website: https://github.com/FiFuProject/FiFuPowered
 
 commands:
@@ -12,7 +12,7 @@ commands:
     usage: /backup [start|status|config|reload]
     permission: fifu.backup.use
   fifu:
-    description: FiFu插件主命令
+    description: FiFu 插件主命令
     usage: /fifu [version|info]
     permission: fifu.admin
 

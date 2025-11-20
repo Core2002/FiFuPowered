@@ -20,7 +20,7 @@ import kotlin.math.abs
  * MAX_INLAND 世界最大岛屿数的单个边长的和
  *
  * Pair<Int, Int>一律为真实坐标
- * Island.SkyLoc一律为岛坐标
+ * Island.SkyLoc 一律为岛坐标
  * @author NekokeCore
  */
 object Sky {
@@ -73,8 +73,8 @@ object Sky {
 
     /**
      * 使用坐标串获取岛屿对象
-     * @param xx x坐标
-     * @param zz z坐标
+     * @param xx x 坐标
+     * @param zz z 坐标
      * @return 岛屿对象
      */
     fun getIsland(xx: Int, zz: Int) = getIsland(Pair(getSkyR(xx), getSkyR(zz)))
@@ -89,10 +89,10 @@ object Sky {
 
     /**
      * 判断坐标元组是否在指定岛屿内
-     * @param xx x坐标
-     * @param zz z坐标
+     * @param xx x 坐标
+     * @param zz z 坐标
      * @param island 岛屿对象
-     * @return 返回True则真，False则假
+     * @return 返回 True 则真，False 则假
      */
     fun isInIsland(xx: Int, zz: Int, island: Island) =
         xx in island.X..island.XX && zz in island.Y..island.YY
@@ -101,8 +101,8 @@ object Sky {
      * 根据当前岛屿位置计算下一个岛屿的位置
      * 该函数通过比较当前位置的横纵坐标来决定下一个岛屿的位置，旨在模拟在天空中移动以寻找岛屿的过程
      *
-     * @param skyLoc 当前天空中的位置，使用Pair表示，first为横坐标，second为纵坐标
-     * @return 下一个岛屿的位置，同样使用Pair表示
+     * @param skyLoc 当前天空中的位置，使用 Pair 表示，first 为横坐标，second 为纵坐标
+     * @return 下一个岛屿的位置，同样使用 Pair 表示
      */
     fun nextIsLand(skyLoc: Pair<Int, Int>): Pair<Int, Int> {
         // 当横坐标大于负的纵坐标时，表示当前位置在模拟的“天空”区域的上半部分

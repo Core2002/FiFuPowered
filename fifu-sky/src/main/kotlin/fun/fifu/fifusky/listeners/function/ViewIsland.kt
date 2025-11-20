@@ -115,10 +115,10 @@ class ViewIsland : Listener {
             Action.LEFT_CLICK_AIR -> {
                 if (stars.contains(island)) {
                     stars.remove(island)
-                    player.sendMessage("已将 $island 添加至Star，目前共 ${stars.size} 个岛屿")
+                    player.sendMessage("已将 $island 添加至 Star，目前共 ${stars.size} 个岛屿")
                 } else {
                     stars.add(island)
-                    player.sendMessage("已将 $island 从Star移除，目前共 ${stars.size} 个岛屿")
+                    player.sendMessage("已将 $island 从 Star 移除，目前共 ${stars.size} 个岛屿")
                 }
                 FileUtil.writeUtf8String(gson.toJson(stars).toString(), starIslandPath)
             }

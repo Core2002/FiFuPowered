@@ -15,13 +15,13 @@ package `fun`.fifu.fifusky
 /**
  * 代表一个岛屿单元
  *
- * x代表x坐标起始位置
- * xx代表x坐标终止位置
+ * x 代表 x 坐标起始位置
+ * xx 代表 x 坐标终止位置
  * 同理
- * y代表y坐标起始位置
- * yy代表y坐标终止位置
+ * y 代表 y 坐标起始位置
+ * yy 代表 y 坐标终止位置
  *
- * r代表x，y相等，以此类推
+ * r 代表 x，y 相等，以此类推
  * @author NekokeCore
  */
 data class Island(

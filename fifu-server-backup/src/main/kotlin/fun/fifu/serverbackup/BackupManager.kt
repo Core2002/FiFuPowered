@@ -247,13 +247,13 @@ object BackupManager {
         
         // 文件存在性检查
         if (!file.exists()) {
-            throw IOException("文件不存在: $filePath")
+            throw IOException("文件不存在：$filePath")
         }
         
-        // 文件大小检查 (限制为1GB)
+        // 文件大小检查 (限制为 1GB)
         val maxSizeBytes = 1024L * 1024L * 1024L
         if (file.length() > maxSizeBytes) {
-            throw IOException("文件过大: ${file.length()} bytes, 最大允许: $maxSizeBytes bytes")
+            throw IOException("文件过大：${file.length()} bytes, 最大允许：$maxSizeBytes bytes")
         }
 
         val fileBody = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
@@ -274,12 +274,12 @@ object BackupManager {
             val responseBody = response.body?.string() ?: ""
             if (!response.isSuccessful) {
                 if (retry > 0) {
-                    println("文件${filePath}上传失败，HTTP状态码: ${response.code}, 正在重试，剩余重试次数：${retry - 1}")
-                    Thread.sleep(2000) // 重试前等待2秒
+                    println("文件${filePath}上传失败，HTTP 状态码：${response.code}, 正在重试，剩余重试次数：${retry - 1}")
+                    Thread.sleep(2000) // 重试前等待 2 秒
                     uploadFile(filePath, url, retry - 1)
                     return
                 } else {
-                    throw IOException("上传失败，HTTP状态码: ${response.code}, 响应: $responseBody")
+                    throw IOException("上传失败，HTTP 状态码：${response.code}, 响应：$responseBody")
                 }
             }
             
@@ -296,7 +296,7 @@ object BackupManager {
                 }
             }
             
-            println("文件上传成功: $filePath, 响应: $responseBody")
+            println("文件上传成功：$filePath, 响应：$responseBody")
         }
     }
 
@@ -377,19 +377,19 @@ object BackupManager {
             val secret = secretGenerator.generate()
             configPojo.sendRemoteServerSecret = secret
             ConfigCenter.setValue(configFileName, "sendRemoteServerSecret", ConfigCenter.convertToJsonPrimitive(secret))
-            println("已生成新的TOTP密钥，请确保客户端同步更新")
+            println("已生成新的 TOTP 密钥，请确保客户端同步更新")
         }
-        val codeGenerator = DefaultCodeGenerator(HashingAlgorithm.SHA512, 6) // 6位数字
+        val codeGenerator = DefaultCodeGenerator(HashingAlgorithm.SHA512, 6) // 6 位数字
         val timeProvider = SystemTimeProvider()
 
-        // 使用30秒时间窗口，但增加时间容差
+        // 使用 30 秒时间窗口，但增加时间容差
         val currentTime = timeProvider.time
         val timeSlot = currentTime.floorDiv(30)
         
         return try {
             codeGenerator.generate(configPojo.sendRemoteServerSecret, timeSlot)
         } catch (e: Exception) {
-            throw RuntimeException("TOTP代码生成失败", e)
+            throw RuntimeException("TOTP 代码生成失败", e)
         }
     }
 
@@ -403,7 +403,7 @@ object BackupManager {
     fun calculateSha512(filePath: String): String {
         val file = File(filePath)
         if (!file.exists()) {
-            throw RuntimeException("文件不存在: $filePath")
+            throw RuntimeException("文件不存在：$filePath")
         }
         
         return try {
@@ -418,7 +418,7 @@ object BackupManager {
             val messageDigest = md.digest()
             messageDigest.joinToString("") { "%02x".format(it) }
         } catch (e: Exception) {
-            throw RuntimeException("计算SHA-512失败: $filePath", e)
+            throw RuntimeException("计算 SHA-512 失败：$filePath", e)
         }
     }
 

@@ -22,7 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
 /**
- * FiFuSky插件主类
+ * FiFuSky 插件主类
  * @author NekokeCore
  */
 class FiFuSky : JavaPlugin() {
@@ -64,7 +64,7 @@ class FiFuSky : JavaPlugin() {
         }
 
         logger.info(SQLiteer.getIslandData(Sky.getIsland("(0,0)")).toString())
-        logger.info("FiFu空岛插件已启动！")
+        logger.info("FiFu 空岛插件已启动！")
     }
 
     /**

@@ -19,7 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import java.util.*
 
 /**
- * 这里存储了FiFu的物品
+ * 这里存储了 FiFu 的物品
  * @author NekokeCore
  */
 class FiFuItems {
@@ -52,7 +52,7 @@ class FiFuItems {
             val itemStack = ItemStack(Material.NETHER_STAR)
             val im: ItemMeta = itemStack.itemMeta
             im.setDisplayName("弈颗星欸")
-            im.lore = Collections.singletonList("放在副手+滚轮可以参观岛屿")
+            im.lore = Collections.singletonList("放在副手 + 滚轮可以参观岛屿")
 //            im.addEnchant(Enchantment.OXYGEN, 10, true)
             itemStack.itemMeta = im
             return itemStack

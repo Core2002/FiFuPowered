@@ -37,7 +37,7 @@ class ServerBackup : JavaPlugin() {
             ConfigCenter.makeDefaultConfig("ServerBackupConfig", BackupManager.configPojo)
             logger.info("配置加载完成")
         } catch (e: Exception) {
-            logger.severe("配置加载失败: ${e.message}")
+            logger.severe("配置加载失败：${e.message}")
         }
 
         // 启动定时任务
@@ -48,13 +48,13 @@ class ServerBackup : JavaPlugin() {
                     checkCanBackup.run()
                     logger.info("正在检查备份，现在${if (isTimeToDoBackup) "需要" else "不需要"}备份")
                 } catch (e: Exception) {
-                    logger.severe("备份检查过程中发生错误: ${e.message}")
+                    logger.severe("备份检查过程中发生错误：${e.message}")
                     e.printStackTrace()
                 }
             }
         }.runTaskTimer(this, interval, interval)
 
-        logger.info("FiFuServerBackup插件已启用")
+        logger.info("FiFuServerBackup 插件已启用")
     }
 
     override fun onDisable() {
@@ -69,9 +69,9 @@ class ServerBackup : JavaPlugin() {
             ConfigCenter.saveAll()
             logger.info("配置已保存")
         } catch (e: Exception) {
-            logger.severe("配置保存失败: ${e.message}")
+            logger.severe("配置保存失败：${e.message}")
         }
 
-        logger.info("FiFuServerBackup插件已禁用")
+        logger.info("FiFuServerBackup 插件已禁用")
     }
 }

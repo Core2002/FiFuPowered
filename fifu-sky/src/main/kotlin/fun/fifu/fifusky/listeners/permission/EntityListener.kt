@@ -42,7 +42,7 @@ import java.io.ByteArrayOutputStream
  */
 class EntityListener : Listener {
     /**
-     * 当一个生物体在世界中出生时触发该事件.
+     * 当一个生物体在世界中出生时触发该事件。
      *
      * @param event
      */
@@ -168,7 +168,7 @@ class EntityListener : Listener {
         playerInvOutputStream.close()
 
         if (itemSize + invSize >= maxSize) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c你试图捡起的这个物品要素过多，为了安全起见，不能被捡起。"))
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c 你试图捡起的这个物品要素过多，为了安全起见，不能被捡起。"))
             entityPickupItemEvent.isCancelled = true
         }
     }

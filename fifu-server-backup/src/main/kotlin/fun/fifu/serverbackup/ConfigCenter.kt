@@ -52,7 +52,7 @@ object ConfigCenter {
         return try {
             gson.fromJson(gson.toJson(getConfigObject(fileName)), clazz)
         } catch (e: Exception) {
-            throw RuntimeException("读取配置快照失败: $fileName", e)
+            throw RuntimeException("读取配置快照失败：$fileName", e)
         }
     }
 
@@ -64,7 +64,7 @@ object ConfigCenter {
             val config = getConfigObject(fileName)
             validator(config)
         } catch (e: Exception) {
-            println("配置验证失败: $fileName, 错误: ${e.message}")
+            println("配置验证失败：$fileName, 错误：${e.message}")
             false
         }
     }

@@ -101,7 +101,7 @@ object SkyOperator {
 
         // 开始拷贝初始空岛
         Bukkit.getScheduler().runTask(FiFuSky.fs, Runnable {
-            FiFuSky.fs.logger.info("开始拷贝初始空岛: $command")
+            FiFuSky.fs.logger.info("开始拷贝初始空岛：$command")
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
             world.getBlockAt(ic.first, 60, ic.second).setType(Material.BEDROCK, true)
             FiFuSky.fs.logger.info("复制完毕！耗时 ${System.currentTimeMillis() - startTime} ms。")
@@ -114,9 +114,9 @@ object SkyOperator {
      * 加载区块
      *
      * @param world 世界对象，用于确定区块所属的世界
-     * @param x X坐标，用于确定初始位置
-     * @param y Y坐标，用于确定初始位置
-     * @param z Z坐标，用于确定初始位置
+     * @param x X 坐标，用于确定初始位置
+     * @param y Y 坐标，用于确定初始位置
+     * @param z Z 坐标，用于确定初始位置
      * @param chunkSize 区块大小，用于确定加载区块的范围
      */
     private fun loadChunks(world: World, x: Double, y: Double, z: Double, chunkSize: Int) {
@@ -321,7 +321,7 @@ object SkyOperator {
     }
 
     /**
-     * 当玩家get岛屿成功后执行该方法
+     * 当玩家 get 岛屿成功后执行该方法
      * @param player 领取完岛屿的玩家
      */
     fun playerGetOver(player: Player, islandData: IslandData) {
@@ -413,8 +413,8 @@ object SkyOperator {
     }
 
     /**
-     * 将该区块转换成ChunkLoc
-     * @return 该区块的ChunkLoc
+     * 将该区块转换成 ChunkLoc
+     * @return 该区块的 ChunkLoc
      */
     fun Chunk.toChunkLoc() = "[${x},${z}]"
 
@@ -430,7 +430,7 @@ object SkyOperator {
     }
 
     /**
-     * 判断玩家是否为FiFuAdmin
+     * 判断玩家是否为 FiFuAdmin
      * @return true：是    false：不是
      */
     fun Player.isFiFuAdmin() = Jsoner.judUUIDisFiFuAdmin(uniqueId.toString())

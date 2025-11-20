@@ -69,7 +69,7 @@ class SkyCommand : TabExecutor {
     private val helpMassage = mapOf(
         "help" to "/s help [命令] 查看帮助",
         "get-new-island" to "/s get-new-island 领取一个新的岛屿，一个月只能领一次",
-        "info" to "/s info 查询当前岛屿信息，/s info u 使用uuid查看",
+        "info" to "/s info 查询当前岛屿信息，/s info u 使用 uuid 查看",
         "homes" to "/s homes 查询你有权限的岛屿",
         "go" to "/s go <SkyLoc> 传送到目标岛屿",
         "add-member" to "/s add-member <玩家名> 把目标玩家添加到你所在的岛的成员里",
@@ -77,8 +77,8 @@ class SkyCommand : TabExecutor {
         "renounce" to "/s renounce 放弃你所在的岛屿",
         "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
         "chunk" to "/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
-        "set-home" to "/s set-home 变更/s的默认传送岛屿为当前所在的岛屿",
-        "tpa" to "/s tpa [玩家名] 接受传送/请求传送到[玩家名]"
+        "set-home" to "/s set-home 变更/s 的默认传送岛屿为当前所在的岛屿",
+        "tpa" to "/s tpa [玩家名] 接受传送/请求传送到 [玩家名]"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
@@ -170,7 +170,7 @@ class SkyCommand : TabExecutor {
         val homeMembers = p0.getIslandHomes().second
         if (homeOwners.contains(island) || homeMembers.contains(island)) {
             SQLiteer.savePlayerIndex(p0.uniqueId.toString(), island)
-            p0.sendMessage("成功变更默认传送岛屿为：$island ，使用/s可来回传送")
+            p0.sendMessage("成功变更默认传送岛屿为：$island，使用/s 可来回传送")
         } else {
             p0.sendMessage("你不是岛屿 $island 的所有者或成员，无权操作")
             return true
@@ -351,7 +351,7 @@ class SkyCommand : TabExecutor {
         val island = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
         val homes = p0.getIslandHomes()
         val homeInfo = """
-            ${p0.name} 现在所在的岛屿的SkyLoc是 $island
+            ${p0.name} 现在所在的岛屿的 SkyLoc 是 $island
             你拥有的岛屿有：
             ${homes.first}
             你加入的岛屿有：
@@ -365,11 +365,11 @@ class SkyCommand : TabExecutor {
         val u = p3.size > 1 && p3[1] == "u"
         val island = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
         val info = """
-            ${p0.name} 现在所在的岛屿的SkyLoc是 $island
-            该岛屿的X：${island.X}
-            该岛屿的XX：${island.XX}
-            该岛屿的Y：${island.Y}
-            该岛屿的YY：${island.YY}
+            ${p0.name} 现在所在的岛屿的 SkyLoc 是 $island
+            该岛屿的 X：${island.X}
+            该岛屿的 XX：${island.XX}
+            该岛屿的 Y：${island.Y}
+            该岛屿的 YY：${island.YY}
             该岛屿的主人有：
             ${island.getOwnersList(u)}
             该岛屿的成员有：
@@ -451,7 +451,7 @@ class SkyCommand : TabExecutor {
     }
 
     /**
-     * 获取验证码，范围是a-z 0-9
+     * 获取验证码，范围是 a-z 0-9
      * @return 验证码
      */
     private fun getCAPTCHA(): String {

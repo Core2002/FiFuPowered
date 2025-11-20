@@ -12,12 +12,12 @@ import java.util.*
 
 /**
  * 中间件对象，负责处理与排名相关的数据操作。
- * 包括读取、存储和计算玩家的挖掘数量，以及管理玩家名称和UUID之间的映射。
+ * 包括读取、存储和计算玩家的挖掘数量，以及管理玩家名称和 UUID 之间的映射。
  */
 object Middleware {
     var data: JSONObject // 存储玩家挖掘数量的数据对象
-    var uuid2name: JSONObject // 存储玩家UUID和名称映射的数据对象
-    var ignore: JSONObject // 存储被忽略的玩家UUID的数据对象
+    var uuid2name: JSONObject // 存储玩家 UUID 和名称映射的数据对象
+    var ignore: JSONObject // 存储被忽略的玩家 UUID 的数据对象
     const val pluginName = "FiFuMiningList" // 插件名称
     lateinit var ranking: ArrayList<String> // 排名列表
 
@@ -47,7 +47,7 @@ object Middleware {
     // 用于快速排序的辅助列表
     private val arr = arrayListOf<BigInteger>()
 
-    // 临时存储匹配到的UUID列表
+    // 临时存储匹配到的 UUID 列表
     private val over = arrayListOf<String>()
 
     // 最终的排名列表
@@ -78,7 +78,7 @@ object Middleware {
     }
 
     /**
-     * 读取指定UUID的挖掘数量。
+     * 读取指定 UUID 的挖掘数量。
      */
     fun readData(uuid: String): String {
         if (data[uuid] == null)
@@ -87,7 +87,7 @@ object Middleware {
     }
 
     /**
-     * 更新指定UUID的挖掘数量。
+     * 更新指定 UUID 的挖掘数量。
      */
     fun putData(uuid: String, num: String) {
         data[uuid] = num
@@ -95,7 +95,7 @@ object Middleware {
     }
 
     /**
-     * 根据UUID获取玩家名称。
+     * 根据 UUID 获取玩家名称。
      */
     fun uuid2name(uuid: String): String {
         if (uuid2name[uuid] == null)
@@ -104,7 +104,7 @@ object Middleware {
     }
 
     /**
-     * 更新UUID和玩家名称的映射。
+     * 更新 UUID 和玩家名称的映射。
      */
     fun putUuid2Name(uuid: String, name: String) {
         if (!uuid2name.contains(uuid)) {
@@ -125,7 +125,7 @@ object Middleware {
     }
 
     /**
-     * 检查指定UUID是否被忽略。
+     * 检查指定 UUID 是否被忽略。
      */
     fun inIgnore(uuid: String): Boolean {
         for (x in ignore.keys) {
@@ -136,7 +136,7 @@ object Middleware {
     }
 
     /**
-     * 将指定UUID添加到忽略列表。
+     * 将指定 UUID 添加到忽略列表。
      */
     fun addIgnore(uuid: String) {
         ignore[uuid] = System.currentTimeMillis().toString()
@@ -144,7 +144,7 @@ object Middleware {
     }
 
     /**
-     * 从忽略列表中移除指定UUID。
+     * 从忽略列表中移除指定 UUID。
      */
     fun removeIgnore(uuid: String) {
         ignore.remove(uuid)
@@ -173,8 +173,8 @@ object Middleware {
     /**
      * 保存所有相关数据到配置文件中。
      *
-     * 此函数负责调用[saveConfigFile]来保存不同类型的配置数据，包括排行榜数据、UUID到名称的映射，以及忽略列表。
-     * 通过统一调用[saveConfigFile]函数，减少了重复代码，提高了代码的维护性和可读性。
+     * 此函数负责调用 [saveConfigFile] 来保存不同类型的配置数据，包括排行榜数据、UUID 到名称的映射，以及忽略列表。
+     * 通过统一调用 [saveConfigFile] 函数，减少了重复代码，提高了代码的维护性和可读性。
      *
      * @see saveConfigFile
      * @see calLeaderboard
@@ -189,9 +189,9 @@ object Middleware {
     /**
      * 保存配置文件。
      *
-     * 该函数用于将JSONObject序列化为JSON字符串，并写入指定名称的配置文件中。如果文件不存在，则会初始化文件。
+     * 该函数用于将 JSONObject 序列化为 JSON 字符串，并写入指定名称的配置文件中。如果文件不存在，则会初始化文件。
      *
-     * @param jsonObject 要保存的JSONObject对象，它将被转换为JSON字符串并写入文件。
+     * @param jsonObject 要保存的 JSONObject 对象，它将被转换为 JSON 字符串并写入文件。
      * @param name 配置文件的名称，不包括后缀。该名称将用于生成文件路径。
      */
     private fun saveConfigFile(jsonObject: JSONObject, name: String) {
@@ -205,11 +205,11 @@ object Middleware {
     /**
      * 初始化配置文件。
      *
-     * 此函数用于创建并初始化一个指定名称的配置文件。如果文件不存在，它会创建一个新文件并写入空的JSON对象。
+     * 此函数用于创建并初始化一个指定名称的配置文件。如果文件不存在，它会创建一个新文件并写入空的 JSON 对象。
      * 这确保了后续操作可以安全地读取和修改配置文件的内容。
      *
      * @param name 配置文件的名称，不包括后缀.json。
-     * @return 返回一个JSONObject，表示已初始化的配置文件内容。
+     * @return 返回一个 JSONObject，表示已初始化的配置文件内容。
      */
     private fun initConfigFile(name: String): JSONObject {
         val file = File("./plugins/${pluginName}/${name}.json")
@@ -223,11 +223,11 @@ object Middleware {
     }
 
     /**
-     * 使用快速排序算法对BigInteger类型的数组进行排序。
+     * 使用快速排序算法对 BigInteger 类型的数组进行排序。
      * 选择数组的第一个元素作为基准值，通过不断地交换元素，将数组分为两部分：左侧的元素都小于等于基准值，右侧的元素都大于等于基准值。
      * 然后对左右两部分分别进行递归排序，最终实现整个数组的排序。
      *
-     * @param a 要排序的BigInteger类型数组
+     * @param a 要排序的 BigInteger 类型数组
      * @param left 排序的起始位置
      * @param right 排序的结束位置
      */

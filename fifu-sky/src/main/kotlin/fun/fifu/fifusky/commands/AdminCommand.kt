@@ -40,10 +40,10 @@ class AdminCommand : TabExecutor {
     private val fiFuItems = mutableListOf<String>()
 
     private val helpMassage = mapOf(
-        "build-island" to "/fs-admin build-island <SkyLoc> 来build一个岛",
+        "build-island" to "/fs-admin build-island <SkyLoc> 来 build 一个岛",
         "make-member" to "/fs-admin make-member 将自己纳入该岛屿的成员",
         "exit-member" to "/fs-admin exit-member 将自己退出该岛屿成员",
-        "get-item" to "/fs-admin get-item <FiFuItem> 获得FiFuItem",
+        "get-item" to "/fs-admin get-item <FiFuItem> 获得 FiFuItem",
         "view-player-inventory" to "/fs-admin view-player-inventory <玩家名> 查看玩家的背包",
         "view-player-ender-chest" to "fs-admin view-player-ender-chest <玩家名> 查看玩家的末影箱"
     )
@@ -75,7 +75,7 @@ class AdminCommand : TabExecutor {
         """.trimIndent()
         )
         if (p0 !is Player || !p0.isFiFuAdmin()) {
-            p0.sendMessage("你必须是FiFu管理员才能在游戏内使用此命令")
+            p0.sendMessage("你必须是 FiFu 管理员才能在游戏内使用此命令")
             return true
         }
         if (p3.isEmpty()) return onHelp(p0, p3)

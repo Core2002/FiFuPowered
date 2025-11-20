@@ -20,7 +20,7 @@ class Main {
             val cmd = parser.parse(options, args)
 
             if (args.isEmpty() || cmd.hasOption(helpOption)) {
-                formatter.printHelp("有没有一种可能，这只是一只普通的Minecraft插件捏qwq", options)
+                formatter.printHelp("有没有一种可能，这只是一只普通的 Minecraft 插件捏 qwq", options)
                 return
             }
 

@@ -25,7 +25,7 @@ public class Yao extends JavaPlugin implements Listener {
     /**
      * 当插件启用时调用此方法。
      * 此方法用于初始化插件，注册事件监听器，并输出启动信息到日志。
-     * 调用超类的onEnable方法以确保插件的正确启用。
+     * 调用超类的 onEnable 方法以确保插件的正确启用。
      */
     @Override
     public void onEnable() {
@@ -33,9 +33,9 @@ public class Yao extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         
         // 输出插件启动信息到服务器日志，方便管理员确认插件已成功启动。
-        getServer().getLogger().info("小瑶瑶插件已启动,author: NekokeCore");
+        getServer().getLogger().info("小瑶瑶插件已启动，author: NekokeCore");
         
-        // 调用父类的onEnable方法，完成插件启用的必要步骤。
+        // 调用父类的 onEnable 方法，完成插件启用的必要步骤。
         super.onEnable();
     }
 

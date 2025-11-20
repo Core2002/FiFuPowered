@@ -149,18 +149,18 @@ object DataServer {
 
         var successCount = 0
         var failureCount = 0
-        val maxFileSize = 1024L * 1024L * 1024L // 1GB限制
+        val maxFileSize = 1024L * 1024L * 1024L // 1GB 限制
 
         for (fileUpload in fileUploads) {
             val uploadedFileName = fileUpload.uploadedFileName()
             val fileName = fileUpload.fileName()
             val fileSize = fileUpload.size()
 
-            println("接收到文件: $fileName (大小: $fileSize bytes)")
+            println("接收到文件：$fileName (大小：$fileSize bytes)")
 
             // 文件大小检查
             if (fileSize > maxFileSize) {
-                println("文件过大，拒绝上传: $fileName")
+                println("文件过大，拒绝上传：$fileName")
                 vertx.fileSystem().delete(uploadedFileName)
                 failureCount++
                 continue
@@ -168,7 +168,7 @@ object DataServer {
 
             // 文件名安全检查
             if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
-                println("文件名包含非法字符，拒绝上传: $fileName")
+                println("文件名包含非法字符，拒绝上传：$fileName")
                 vertx.fileSystem().delete(uploadedFileName)
                 failureCount++
                 continue
@@ -178,17 +178,17 @@ object DataServer {
             val targetPath = Paths.get(configPojo.backupServerDirPath, fileName).toString()
             vertx.fileSystem().move(uploadedFileName, targetPath) {
                 if (it.succeeded()) {
-                    println("文件上传成功: $fileName")
+                    println("文件上传成功：$fileName")
                     successCount++
                 } else {
-                    println("文件移动失败: $fileName, 错误: ${it.cause()?.message}")
+                    println("文件移动失败：$fileName, 错误：${it.cause()?.message}")
                     vertx.fileSystem().delete(uploadedFileName)
                     failureCount++
                 }
             }
         }
 
-        val responseMessage = "上传完成 - 成功: $successCount, 失败: $failureCount"
+        val responseMessage = "上传完成 - 成功：$successCount, 失败：$failureCount"
         routingContext.response().setStatusCode(if (failureCount == 0) 200 else 207).end(responseMessage)
     }
 
@@ -204,7 +204,7 @@ object DataServer {
         // 检查授权头是否存在
         val codeForClient = routingContext.request().getHeader("Authorization")
         if (codeForClient == null || codeForClient.isBlank()) {
-            println("缺少授权头，来自IP: ${routingContext.request().remoteAddress().host()}")
+            println("缺少授权头，来自 IP: ${routingContext.request().remoteAddress().host()}")
             handleFileDeletion(routingContext)
             routingContext.response().setStatusCode(401).end("Missing authorization header")
             return
@@ -212,7 +212,7 @@ object DataServer {
 
         // 检查密钥是否已配置
         if (configPojo.sendRemoteServerSecret.isBlank()) {
-            println("服务器未配置TOTP密钥")
+            println("服务器未配置 TOTP 密钥")
             handleFileDeletion(routingContext)
             routingContext.response().setStatusCode(500).end("Server not configured")
             return
@@ -220,20 +220,20 @@ object DataServer {
 
         try {
             if (!verifier.isValidCode(configPojo.sendRemoteServerSecret, codeForClient)) {
-                println("授权验证失败，来自IP: ${routingContext.request().remoteAddress().host()}")
+                println("授权验证失败，来自 IP: ${routingContext.request().remoteAddress().host()}")
                 handleFileDeletion(routingContext)
                 routingContext.response().setStatusCode(401).end("Unauthorized")
                 return
             }
         } catch (e: Exception) {
-            println("授权验证异常: ${e.message}, 来自IP: ${routingContext.request().remoteAddress().host()}")
+            println("授权验证异常：${e.message}, 来自 IP: ${routingContext.request().remoteAddress().host()}")
             handleFileDeletion(routingContext)
             routingContext.response().setStatusCode(401).end("Invalid token")
             return
         }
 
         // 授权验证通过
-        println("授权验证成功，来自IP: ${routingContext.request().remoteAddress().host()}")
+        println("授权验证成功，来自 IP: ${routingContext.request().remoteAddress().host()}")
         routingContext.next()
     }
 
@@ -270,10 +270,10 @@ object DataServer {
 
     /**
      * 从文件名中解析日期
-     * 支持格式: backup_YYYY-MM-DD.zip 或类似格式
+     * 支持格式：backup_YYYY-MM-DD.zip 或类似格式
      *
      * @param filename 文件名
-     * @return 解析出的日期，如果无法解析则返回null
+     * @return 解析出的日期，如果无法解析则返回 null
      */
     fun parseDateFromFilename(filename: String): LocalDate? {
         try {
@@ -314,7 +314,7 @@ object DataServer {
         try {
             val backupDir = File(configPojo.backupServerDirPath)
             if (!backupDir.exists() || !backupDir.isDirectory) {
-                println("备份目录不存在或不是目录: ${configPojo.backupServerDirPath}")
+                println("备份目录不存在或不是目录：${configPojo.backupServerDirPath}")
                 return
             }
 
@@ -337,23 +337,23 @@ object DataServer {
                             if (daysBetween >= configPojo.backupKeepDay) {
                                 if (file.delete()) {
                                     deletedCount++
-                                    println("已删除过期文件: ${file.name} (日期: $fileDate)")
+                                    println("已删除过期文件：${file.name} (日期：$fileDate)")
                                 } else {
                                     errorCount++
-                                    println("删除文件失败: ${file.name}")
+                                    println("删除文件失败：${file.name}")
                                 }
                             }
                         }
                     } catch (e: Exception) {
                         errorCount++
-                        println("处理文件时出错: ${file.name}, 错误: ${e.message}")
+                        println("处理文件时出错：${file.name}, 错误：${e.message}")
                     }
                 }
             }
             
-            println("过期文件扫描完成 - 删除: $deletedCount, 错误: $errorCount")
+            println("过期文件扫描完成 - 删除：$deletedCount, 错误：$errorCount")
         } catch (e: Exception) {
-            println("扫描过期文件时发生错误: ${e.message}")
+            println("扫描过期文件时发生错误：${e.message}")
         }
     }
 }

@@ -51,7 +51,7 @@ class CommandManager : CommandExecutor, TabCompleter {
 
     private fun handleBackupCommand(sender: CommandSender, args: Array<out String>) {
         if (!sender.hasPermission("fifu.backup.use")) {
-            sender.sendMessage("§c你没有权限使用此命令！")
+            sender.sendMessage("§c 你没有权限使用此命令！")
             return
         }
 
@@ -67,7 +67,7 @@ class CommandManager : CommandExecutor, TabCompleter {
 
     private fun handleFiFuCommand(sender: CommandSender, args: Array<out String>) {
         if (!sender.hasPermission("fifu.admin")) {
-            sender.sendMessage("§c你没有权限使用此命令！")
+            sender.sendMessage("§c 你没有权限使用此命令！")
             return
         }
 
@@ -81,54 +81,54 @@ class CommandManager : CommandExecutor, TabCompleter {
 
     private fun startBackup(sender: CommandSender) {
         try {
-            sender.sendMessage("§e正在启动手动备份...")
+            sender.sendMessage("§e 正在启动手动备份...")
             BackupManager.checkCanBackup.run()
-            sender.sendMessage("§a备份任务已启动！")
+            sender.sendMessage("§a 备份任务已启动！")
         } catch (e: Exception) {
-            sender.sendMessage("§c备份启动失败: ${e.message}")
+            sender.sendMessage("§c 备份启动失败：${e.message}")
         }
     }
 
     private fun showBackupStatus(sender: CommandSender) {
         sender.sendMessage("§6=== 备份状态 ===")
-        sender.sendMessage("§f备份功能: ${if (BackupManager.configPojo.enableBackup) "§a启用" else "§c禁用"}")
-        sender.sendMessage("§f远程传输: ${if (BackupManager.configPojo.sendToRemoteServer) "§a启用" else "§c禁用"}")
-        sender.sendMessage("§f备份目录: §7${BackupManager.configPojo.backupServerDirPath}")
-        sender.sendMessage("§f保留天数: §7${BackupManager.configPojo.backupKeepDay}天")
-        sender.sendMessage("§f是否需要备份: ${if (BackupManager.isTimeToDoBackup) "§a是" else "§7否"}")
+        sender.sendMessage("§f 备份功能：${if (BackupManager.configPojo.enableBackup) "§a启用" else "§c禁用"}")
+        sender.sendMessage("§f 远程传输：${if (BackupManager.configPojo.sendToRemoteServer) "§a启用" else "§c禁用"}")
+        sender.sendMessage("§f 备份目录：§7${BackupManager.configPojo.backupServerDirPath}")
+        sender.sendMessage("§f 保留天数：§7${BackupManager.configPojo.backupKeepDay}天")
+        sender.sendMessage("§f 是否需要备份：${if (BackupManager.isTimeToDoBackup) "§a是" else "§7否"}")
     }
 
     private fun showBackupConfig(sender: CommandSender) {
         sender.sendMessage("§6=== 备份配置 ===")
-        sender.sendMessage("§f启用备份: §7${BackupManager.configPojo.enableBackup}")
-        sender.sendMessage("§f备份目录: §7${BackupManager.configPojo.backupServerDirPath}")
-        sender.sendMessage("§f保留天数: §7${BackupManager.configPojo.backupKeepDay}")
-        sender.sendMessage("§f远程传输: §7${BackupManager.configPojo.sendToRemoteServer}")
-        sender.sendMessage("§f远程服务器: §7${BackupManager.configPojo.sendRemoteServerUrl}")
-        sender.sendMessage("§f最大上传大小: §7${BackupManager.configPojo.maxUploadSizeMB}MB")
-        sender.sendMessage("§f检查间隔: §7${BackupManager.configPojo.backupCheckIntervalHours}小时")
+        sender.sendMessage("§f 启用备份：§7${BackupManager.configPojo.enableBackup}")
+        sender.sendMessage("§f 备份目录：§7${BackupManager.configPojo.backupServerDirPath}")
+        sender.sendMessage("§f 保留天数：§7${BackupManager.configPojo.backupKeepDay}")
+        sender.sendMessage("§f 远程传输：§7${BackupManager.configPojo.sendToRemoteServer}")
+        sender.sendMessage("§f 远程服务器：§7${BackupManager.configPojo.sendRemoteServerUrl}")
+        sender.sendMessage("§f 最大上传大小：§7${BackupManager.configPojo.maxUploadSizeMB}MB")
+        sender.sendMessage("§f 检查间隔：§7${BackupManager.configPojo.backupCheckIntervalHours}小时")
     }
 
     private fun reloadBackupConfig(sender: CommandSender) {
         try {
             ConfigCenter.makeDefaultConfig("ServerBackupConfig", BackupManager.configPojo)
-            sender.sendMessage("§a配置已重新加载！")
+            sender.sendMessage("§a 配置已重新加载！")
         } catch (e: Exception) {
-            sender.sendMessage("§c配置加载失败: ${e.message}")
+            sender.sendMessage("§c 配置加载失败：${e.message}")
         }
     }
 
     private fun showVersion(sender: CommandSender) {
         sender.sendMessage("§6=== FiFuServerBackup ===")
-        sender.sendMessage("§f版本: §71.0.0")
-        sender.sendMessage("§f作者: §7NekokeCore")
-        sender.sendMessage("§f许可: §7Mulan PSL v2")
+        sender.sendMessage("§f 版本：§71.0.0")
+        sender.sendMessage("§f 作者：§7NekokeCore")
+        sender.sendMessage("§f 许可：§7Mulan PSL v2")
     }
 
     private fun showInfo(sender: CommandSender) {
         sender.sendMessage("§6=== FiFuServerBackup 信息 ===")
-        sender.sendMessage("§f这是一个Minecraft服务器备份插件")
-        sender.sendMessage("§f支持自动备份、加密传输、远程同步等功能")
+        sender.sendMessage("§f 这是一个 Minecraft 服务器备份插件")
+        sender.sendMessage("§f 支持自动备份、加密传输、远程同步等功能")
         showVersion(sender)
     }
 
@@ -141,7 +141,7 @@ class CommandManager : CommandExecutor, TabCompleter {
     }
 
     private fun showFiFuHelp(sender: CommandSender) {
-        sender.sendMessage("§6=== FiFu命令帮助 ===")
+        sender.sendMessage("§6=== FiFu 命令帮助 ===")
         sender.sendMessage("§f/fifu version §7- 查看版本信息")
         sender.sendMessage("§f/fifu info §7- 查看插件信息")
     }
